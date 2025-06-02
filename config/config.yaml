@@ -1,0 +1,8 @@
+version: 0.0.1
+config:
+    project:
+        name: fass-avs
+        version: 0.1.0
+        context: devnet
+        templateBaseUrl: https://github.com/Layr-Labs/hourglass-avs-template
+        templateVersion: v0.0.11
