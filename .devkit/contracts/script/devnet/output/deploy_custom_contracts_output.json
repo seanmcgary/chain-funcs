@@ -1,8 +1,8 @@
 {
   "addresses": {
-    "": ""
+    "FaaS": "0x240A60DC5e0B9013Cb8CF39aa6f9dDd8f25E40D2"
   },
   "chainInfo": {
-    "chainId": 0
+    "chainId": 31337
   }
 }

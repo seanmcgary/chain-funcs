@@ -15,6 +15,8 @@ build: deps
 	@echo "Building binaries..."
 	go build -o $(OUT)/performer ./cmd/main.go
 
+	# cd clients && make build
+
 deps:
 	GOPRIVATE=github.com/Layr-Labs/* go mod tidy
 
