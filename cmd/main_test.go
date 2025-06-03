@@ -11,6 +11,34 @@ import (
 	"go.uber.org/zap"
 )
 
+// Helper function to encode a FunctionCall struct as Solidity would
+func encodeFunctionCallStruct(fn []byte, fnId [32]byte, input []byte) ([]byte, error) {
+	functionCallType, err := abi.NewType("tuple", "FunctionCall", []abi.ArgumentMarshaling{
+		{Name: "fn", Type: "bytes"},
+		{Name: "fnId", Type: "bytes32"},
+		{Name: "input", Type: "bytes"},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	functionCallArgs := abi.Arguments{
+		{Type: functionCallType, Name: "call"},
+	}
+
+	structValue := struct {
+		Fn    []byte   `abi:"fn"`
+		FnId  [32]byte `abi:"fnId"`
+		Input []byte   `abi:"input"`
+	}{
+		Fn:    fn,
+		FnId:  fnId,
+		Input: input,
+	}
+
+	return functionCallArgs.Pack(structValue)
+}
+
 func TestFunctionCallABIDecoding(t *testing.T) {
 	// Create a logger for testing
 	logger, _ := zap.NewDevelopment()
@@ -23,15 +51,8 @@ func TestFunctionCallABIDecoding(t *testing.T) {
 	testFunctionId := crypto.Keccak256Hash(testFunctionData)
 	testInput := []byte(`["hello", "world"]`) // JSON array of arguments
 
-	// Manually encode the struct using ABI (simulating what the Solidity contract does)
-	functionCallArgs := abi.Arguments{
-		{Type: abi.Type{T: abi.BytesTy}, Name: "fn"},
-		{Type: abi.Type{T: abi.FixedBytesTy, Size: 32}, Name: "fnId"},
-		{Type: abi.Type{T: abi.BytesTy}, Name: "input"},
-	}
-
 	// Pack the data as the Solidity contract would
-	packedData, err := functionCallArgs.Pack(testFunctionData, testFunctionId, testInput)
+	packedData, err := encodeFunctionCallStruct(testFunctionData, testFunctionId, testInput)
 	if err != nil {
 		t.Fatalf("Failed to pack test data: %v", err)
 	}
@@ -134,12 +155,7 @@ func TestFunctionCallValidation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Encode the test data
-			functionCallArgs := abi.Arguments{
-				{Type: abi.Type{T: abi.BytesTy}, Name: "fn"},
-				{Type: abi.Type{T: abi.FixedBytesTy, Size: 32}, Name: "fnId"},
-				{Type: abi.Type{T: abi.BytesTy}, Name: "input"},
-			}
-			packedData, err := functionCallArgs.Pack(tt.fn, tt.fnId, tt.input)
+			packedData, err := encodeFunctionCallStruct(tt.fn, tt.fnId, tt.input)
 			if err != nil {
 				t.Fatalf("Failed to pack test data: %v", err)
 			}
@@ -211,12 +227,7 @@ func BenchmarkABIDecoding(b *testing.B) {
 	testFunctionId := crypto.Keccak256Hash(testFunctionData)
 	testInput := []byte(`["benchmark", "test", "with", "multiple", "arguments"]`)
 
-	functionCallArgs := abi.Arguments{
-		{Type: abi.Type{T: abi.BytesTy}, Name: "fn"},
-		{Type: abi.Type{T: abi.FixedBytesTy, Size: 32}, Name: "fnId"},
-		{Type: abi.Type{T: abi.BytesTy}, Name: "input"},
-	}
-	packedData, _ := functionCallArgs.Pack(testFunctionData, testFunctionId, testInput)
+	packedData, _ := encodeFunctionCallStruct(testFunctionData, testFunctionId, testInput)
 
 	b.ResetTimer()
 	b.ReportAllocs()
@@ -243,12 +254,7 @@ func Test_TaskRequestPayload(t *testing.T) {
 	testFunctionId := crypto.Keccak256Hash(testFunctionData)
 	testInput := []byte(`["test"]`)
 
-	functionCallArgs := abi.Arguments{
-		{Type: abi.Type{T: abi.BytesTy}, Name: "fn"},
-		{Type: abi.Type{T: abi.FixedBytesTy, Size: 32}, Name: "fnId"},
-		{Type: abi.Type{T: abi.BytesTy}, Name: "input"},
-	}
-	packedData, _ := functionCallArgs.Pack(testFunctionData, testFunctionId, testInput)
+	packedData, _ := encodeFunctionCallStruct(testFunctionData, testFunctionId, testInput)
 
 	taskRequest := &performerV1.TaskRequest{
 		TaskId:   []byte("test-task-id"),

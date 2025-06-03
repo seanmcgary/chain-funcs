@@ -11,6 +11,34 @@ import (
 	"go.uber.org/zap"
 )
 
+// Helper function to encode a FunctionCall struct as Solidity would
+func encodeFunctionCallStructLocal(fn []byte, fnId [32]byte, input []byte) ([]byte, error) {
+	functionCallType, err := abi.NewType("tuple", "FunctionCall", []abi.ArgumentMarshaling{
+		{Name: "fn", Type: "bytes"},
+		{Name: "fnId", Type: "bytes32"},
+		{Name: "input", Type: "bytes"},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	functionCallArgs := abi.Arguments{
+		{Type: functionCallType, Name: "call"},
+	}
+
+	structValue := struct {
+		Fn    []byte   `abi:"fn"`
+		FnId  [32]byte `abi:"fnId"`
+		Input []byte   `abi:"input"`
+	}{
+		Fn:    fn,
+		FnId:  fnId,
+		Input: input,
+	}
+
+	return functionCallArgs.Pack(structValue)
+}
+
 func TestTaskWorker_ValidateTask(t *testing.T) {
 	logger, _ := zap.NewDevelopment()
 	tw := NewTaskWorker(logger)
@@ -19,13 +47,8 @@ func TestTaskWorker_ValidateTask(t *testing.T) {
 	fnId := [32]byte{1, 2, 3}
 	input := []byte(`["arg1", "arg2"]`)
 
-	// Encode using ABI
-	functionCallArgs := abi.Arguments{
-		{Type: abi.Type{T: abi.BytesTy}, Name: "fn"},
-		{Type: abi.Type{T: abi.FixedBytesTy, Size: 32}, Name: "fnId"},
-		{Type: abi.Type{T: abi.BytesTy}, Name: "input"},
-	}
-	payload, err := functionCallArgs.Pack(fn, fnId, input)
+	// Encode using ABI tuple structure
+	payload, err := encodeFunctionCallStructLocal(fn, fnId, input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,13 +87,8 @@ func TestTaskWorker_ValidateTask_EmptyFunction(t *testing.T) {
 	fnId := [32]byte{1, 2, 3}
 	input := []byte(`["arg1", "arg2"]`)
 
-	// Encode using ABI
-	functionCallArgs := abi.Arguments{
-		{Type: abi.Type{T: abi.BytesTy}, Name: "fn"},
-		{Type: abi.Type{T: abi.FixedBytesTy, Size: 32}, Name: "fnId"},
-		{Type: abi.Type{T: abi.BytesTy}, Name: "input"},
-	}
-	payload, err := functionCallArgs.Pack(fn, fnId, input)
+	// Encode using ABI tuple structure
+	payload, err := encodeFunctionCallStructLocal(fn, fnId, input)
 	if err != nil {
 		t.Fatal(err)
 	}
