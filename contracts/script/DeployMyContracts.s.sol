@@ -9,7 +9,7 @@ import {ITaskMailbox, ITaskMailboxTypes} from "@hourglass-monorepo/src/interface
 import {ITaskAVSRegistrar, ITaskAVSRegistrarTypes} from "@hourglass-monorepo/src/interfaces/avs/l1/ITaskAVSRegistrar.sol";
 import {IAVSTaskHook} from "@hourglass-monorepo/src/interfaces/avs/l2/IAVSTaskHook.sol";
 import {IBN254CertificateVerifier} from "@hourglass-monorepo/src/interfaces/avs/l2/IBN254CertificateVerifier.sol";
-import {HelloWorld} from "@project/HelloWorld.sol"; // Import your custom contract
+import {FaaS} from "@project/FaaS.sol";
 
 contract DeployMyContracts is Script {
     using stdJson for string;
@@ -35,11 +35,16 @@ contract DeployMyContracts is Script {
 
         vm.startBroadcast(context.deployerPrivateKey);
         console.log("Deployer address:", vm.addr(context.deployerPrivateKey));
-
-        //TODO: Implement custom contracts deployment
-        // CustomContract customContract = new CustomContract();
-        // console.log("CustomContract deployed to:", address(customContract));
-        HelloWorld helloWorld = new HelloWorld();
+        
+        // For FaaS, we need to get the first executor operator set ID from the AVS config
+        ITaskMailbox.AvsConfig memory avsConfig = context.taskMailbox.getAvsConfig(context.avs);
+        require(avsConfig.executorOperatorSetIds.length > 0, "No executor operator set configured");
+        uint32 executorOperatorSetId = avsConfig.executorOperatorSetIds[0];
+        
+        FaaS faas = new FaaS(address(context.taskMailbox), context.avs, executorOperatorSetId);
+        console.log("FaaS deployed to:", address(faas));
+        console.log("Using AVS:", context.avs);
+        console.log("Using executor operator set ID:", executorOperatorSetId);
 
         vm.stopBroadcast();
 
@@ -50,11 +55,8 @@ contract DeployMyContracts is Script {
 
         vm.stopBroadcast();
 
-        //TODO: Write to output file
         Output[] memory outputs = new Output[](1);
-        // outputs[0] = Output({name: "CustomContract", address: address(customContract)});
-        // _writeOutputToJson(environment, outputs);
-        outputs[0] = Output({name: "HelloWorld", contractAddress: address(helloWorld)});
+        outputs[0] = Output({name: "FaaS", contractAddress: address(faas)});
         _writeOutputToJson(environment, outputs);
     }
 

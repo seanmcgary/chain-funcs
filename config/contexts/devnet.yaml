@@ -7,17 +7,17 @@ context:
   chains:
     l1:
       chain_id: 31337
-      rpc_url: "http://localhost:8545"
+      rpc_url: "http://localhost:7545"
       fork:
         block: 22475020
-        url: ""
+        url: "https://tame-fabled-liquid.quiknode.pro/f27d4be93b4d7de3679f5c5ae881233f857407a0/"
         block_time: 3
     l2:
       chain_id: 31337
-      rpc_url: "http://localhost:8545"
+      rpc_url: "http://localhost:7545"
       fork:
         block: 22475020
-        url: ""
+        url: "https://tame-fabled-liquid.quiknode.pro/f27d4be93b4d7de3679f5c5ae881233f857407a0/"
         block_time: 3
   # All key material (BLS and ECDSA) within this file should be used for local testing ONLY
   # ECDSA keys used are from Anvil's private key set
@@ -61,10 +61,39 @@ context:
   # Core EigenLayer contract addresses
   eigenlayer:
     allocation_manager: "0x948a420b8CC1d6BFd0B6087C2E7c344a2CD0bc39"
-    delegation_manager: "0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A" 
+    delegation_manager: "0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A"
   # Contracts deployed on `devnet start`
-  deployed_contracts: []
+  deployed_contracts:
+    - abi: .devkit/contracts/out/TaskMailbox.sol/TaskMailbox.json
+      address: 0x4B7099FD879435a087C364aD2f9E7B3f94d20bBe
+      name: taskMailbox
+    - abi: .devkit/contracts/out/TaskAVSRegistrar.sol/TaskAVSRegistrar.json
+      address: 0x99aA73dA6309b8eC484eF2C95e96C131C1BBF7a0
+      name: taskAVSRegistrar
+    - abi: .devkit/contracts/out/AVSTaskHook.sol/AVSTaskHook.json
+      address: 0x98721EFD3D09A7Ae662C4D63156286DF673FC50B
+      name: avsTaskHook
+    - abi: .devkit/contracts/out/BN254CertificateVerifier.sol/BN254CertificateVerifier.json
+      address: 0xFBc00Fa47a7d3bbE3e82B5Aa560B47008c1bD64c
+      name: bn254CertificateVerifier
+    - abi: .devkit/contracts/out/FaaS.sol/FaaS.json
+      address: 0x240A60DC5e0B9013Cb8CF39aa6f9dDd8f25E40D2
+      name: FaaS
   # Operator Sets registered on `devnet start`
-  operator_sets: []
+  operator_sets:
+    - operator_set_id: 0
+      strategies:
+        - strategy: 0xaCB55C530Acdb2849e6d4f36992Cd8c9D50ED8F7
+        - strategy: 0x93c4b944D05dfe6df7645A86cd2206016c51564D
+    - operator_set_id: 1
+      strategies:
+        - strategy: 0xaCB55C530Acdb2849e6d4f36992Cd8c9D50ED8F7
+        - strategy: 0x93c4b944D05dfe6df7645A86cd2206016c51564D
   # Operators registered on `devnet start`
-  operator_registrations: []
+  operator_registrations:
+    - address: 0x90F79bf6EB2c4f870365E785982E1f101E93b906
+      operator_set_id: 0
+      payload: 000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000001201f231065396b023280ef8d1d9437fed8bddf8234a84ed4d02f461cfc1d447eff2a8cf76350c3a9075ed9e4d17c2286302b9060728552dae2e69678d695f20d641b814272278ad65a10d8b38f714991f8f1286ac4f54e11cb0c3e71045684ffaf2e1105ba372e871fcb16b5a463f03841b33b8160a5cfd5a41517b8b1952623ff15de6881d859600f953e1b00fa58a950c65eac7c86860412b269c2a33bac09e51d37f7f962df4041a82808c85140c6186878b4695673ecd3c6fd1b7953d9f77000161e1c998df8e36d9cd89717ec47a5e385220ea4c9fa4bf419a3563fb5c3541425a016e78736ea3568613ff6338ffcec5a40e597b31ed959bb630d22502a70000000000000000000000000000000000000000000000000000000000000000f61676772656761746f723a393030300000000000000000000000000000000000
+    - address: 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
+      operator_set_id: 1
+      payload: 0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000012025b959a916afa394d4b928538daeda26b8bcc25d10583d4d3745b376b68c2a2d00d9997cb9ee77c1a71c66215d5443fdf473d6bd2da55fc4b2648e472168f5261d029f3c896b4c62359919ab0bce753d489fcbed4f980963a0906e2e181e545c2478dc7b1b068111c6db2db11798a751e3f357be666c68658a25a563fd9a82040ade1cdf142c7dbf27aa9173a6dc34515607a444bd8c178180689a0f80cf38352a547c0d1a5763c18b4af4107c51a1633fb70fc975fe7a8e98b5e224d9dba90c0832c8878dac72b88643c1c9313d0d20eac8b8bbb1347aa9a3d83ee61b7b2a4c237dcae2f9ba22b3a4b6b09e426fa805eb5338c1f4af3ac199ae1259a3a6ae1d000000000000000000000000000000000000000000000000000000000000000d6578656375746f723a3930393000000000000000000000000000000000000000

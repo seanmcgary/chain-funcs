@@ -13,6 +13,14 @@ RUN make build
 
 FROM debian:stable-slim
 
+RUN apt-get update && apt-get install -y \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /build/bin/performer /usr/local/bin/performer
+COPY --from=build /build/scripts/js-runner.js /app/scripts/js-runner.js
+
+RUN chmod +x /app/scripts/js-runner.js
 
 CMD ["/usr/local/bin/performer"]

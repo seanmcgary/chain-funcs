@@ -1,0 +1,377 @@
+{
+  "name": "bn254CertificateVerifier",
+  "address": "0xFBc00Fa47a7d3bbE3e82B5Aa560B47008c1bD64c",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "maxOperatorTableStaleness",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint32",
+              "name": "referenceTimestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "messageHash",
+              "type": "bytes32"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "X",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "Y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct BN254.G1Point",
+              "name": "sig",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "X",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "Y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct BN254.G2Point",
+              "name": "apk",
+              "type": "tuple"
+            },
+            {
+              "internalType": "uint32[]",
+              "name": "nonsignerIndices",
+              "type": "uint32[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint32",
+                  "name": "operatorIndex",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "operatorInfoProofs",
+                  "type": "bytes"
+                },
+                {
+                  "components": [
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "X",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "Y",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct BN254.G1Point",
+                      "name": "pubkey",
+                      "type": "tuple"
+                    },
+                    {
+                      "internalType": "uint96[]",
+                      "name": "weights",
+                      "type": "uint96[]"
+                    }
+                  ],
+                  "internalType": "struct IBN254CertificateVerifier.BN254OperatorInfo",
+                  "name": "operatorInfo",
+                  "type": "tuple"
+                }
+              ],
+              "internalType": "struct IBN254CertificateVerifier.BN254OperatorInfoWitness[]",
+              "name": "nonSignerWitnesses",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct IBN254CertificateVerifier.BN254Certificate",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "name": "verifyCertificate",
+      "outputs": [
+        {
+          "internalType": "uint96[]",
+          "name": "signedStakes",
+          "type": "uint96[]"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint32",
+              "name": "referenceTimestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "messageHash",
+              "type": "bytes32"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "X",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "Y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct BN254.G1Point",
+              "name": "sig",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "X",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "Y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct BN254.G2Point",
+              "name": "apk",
+              "type": "tuple"
+            },
+            {
+              "internalType": "uint32[]",
+              "name": "nonsignerIndices",
+              "type": "uint32[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint32",
+                  "name": "operatorIndex",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "operatorInfoProofs",
+                  "type": "bytes"
+                },
+                {
+                  "components": [
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "X",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "Y",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct BN254.G1Point",
+                      "name": "pubkey",
+                      "type": "tuple"
+                    },
+                    {
+                      "internalType": "uint96[]",
+                      "name": "weights",
+                      "type": "uint96[]"
+                    }
+                  ],
+                  "internalType": "struct IBN254CertificateVerifier.BN254OperatorInfo",
+                  "name": "operatorInfo",
+                  "type": "tuple"
+                }
+              ],
+              "internalType": "struct IBN254CertificateVerifier.BN254OperatorInfoWitness[]",
+              "name": "nonSignerWitnesses",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct IBN254CertificateVerifier.BN254Certificate",
+          "name": "",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint96[]",
+          "name": "",
+          "type": "uint96[]"
+        }
+      ],
+      "name": "verifyCertificateNominal",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint32",
+              "name": "referenceTimestamp",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "messageHash",
+              "type": "bytes32"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "X",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "Y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct BN254.G1Point",
+              "name": "sig",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "X",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "Y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct BN254.G2Point",
+              "name": "apk",
+              "type": "tuple"
+            },
+            {
+              "internalType": "uint32[]",
+              "name": "nonsignerIndices",
+              "type": "uint32[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint32",
+                  "name": "operatorIndex",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "operatorInfoProofs",
+                  "type": "bytes"
+                },
+                {
+                  "components": [
+                    {
+                      "components": [
+                        {
+                          "internalType": "uint256",
+                          "name": "X",
+                          "type": "uint256"
+                        },
+                        {
+                          "internalType": "uint256",
+                          "name": "Y",
+                          "type": "uint256"
+                        }
+                      ],
+                      "internalType": "struct BN254.G1Point",
+                      "name": "pubkey",
+                      "type": "tuple"
+                    },
+                    {
+                      "internalType": "uint96[]",
+                      "name": "weights",
+                      "type": "uint96[]"
+                    }
+                  ],
+                  "internalType": "struct IBN254CertificateVerifier.BN254OperatorInfo",
+                  "name": "operatorInfo",
+                  "type": "tuple"
+                }
+              ],
+              "internalType": "struct IBN254CertificateVerifier.BN254OperatorInfoWitness[]",
+              "name": "nonSignerWitnesses",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct IBN254CertificateVerifier.BN254Certificate",
+          "name": "",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint16[]",
+          "name": "",
+          "type": "uint16[]"
+        }
+      ],
+      "name": "verifyCertificateProportion",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ]
+}

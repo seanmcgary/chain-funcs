@@ -35,3 +35,5 @@ config/contexts/**/*
 
 # Environment
 .env
+
+clients/bin
