@@ -108,6 +108,11 @@ func deployFunction(c *cli.Context) error {
 	fmt.Printf("Function registered successfully!\n")
 	fmt.Printf("Function ID: %s\n", functionID.Hex())
 	fmt.Printf("Gas used: %d\n", receipt.GasUsed)
+	if receipt.EffectiveGasPrice != nil {
+		totalCost := new(big.Int).Mul(big.NewInt(int64(receipt.GasUsed)), receipt.EffectiveGasPrice)
+		fmt.Printf("Gas price: %s gwei\n", formatGasPrice(receipt.EffectiveGasPrice))
+		fmt.Printf("Transaction cost: %s ETH\n", formatWei(totalCost))
+	}
 
 	return nil
 }
@@ -219,6 +224,12 @@ func callFunction(c *cli.Context) error {
 	}
 
 	fmt.Printf("Task ID: %s\n", common.BytesToHash(taskID[:]).Hex())
+	fmt.Printf("Gas used: %d\n", receipt.GasUsed)
+	if receipt.EffectiveGasPrice != nil {
+		totalCost := new(big.Int).Mul(big.NewInt(int64(receipt.GasUsed)), receipt.EffectiveGasPrice)
+		fmt.Printf("Gas price: %s gwei\n", formatGasPrice(receipt.EffectiveGasPrice))
+		fmt.Printf("Transaction cost: %s ETH\n", formatWei(totalCost))
+	}
 	fmt.Printf("Listening for TaskVerified event...\n")
 
 	// Subscribe to TaskVerified events using WebSocket client
@@ -395,4 +406,16 @@ func handleTaskVerifiedEvent(vLog types.Log) error {
 	}
 
 	return nil
+}
+
+// formatGasPrice formats gas price from wei to gwei with proper decimal places
+func formatGasPrice(gasPrice *big.Int) string {
+	gwei := new(big.Float).Quo(new(big.Float).SetInt(gasPrice), big.NewFloat(1e9))
+	return gwei.Text('f', 2)
+}
+
+// formatWei formats wei amount to ETH with proper decimal places
+func formatWei(wei *big.Int) string {
+	eth := new(big.Float).Quo(new(big.Float).SetInt(wei), big.NewFloat(1e18))
+	return eth.Text('f', 6)
 }
