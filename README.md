@@ -38,37 +38,45 @@ This AVS (Autonomous Verifiable Service) enables users to deploy and execute Jav
 - Go 1.21+
 - Docker
 - Git
+- [Hourglass DevKit](https://github.com/Layr-Labs/hourglass-monorepo) (install with `npm install -g @layr-labs/hourglass-devkit`)
 
 ### 1. Clone and Build
 
 ```bash
 git clone <repository-url>
 cd fass-avs
-make build
+
+# Install Hourglass DevKit if not already installed
+npm install -g @layr-labs/hourglass-devkit
+
+# Build the project
+devkit avs build
 ```
 
 This builds:
 - `./bin/performer` - JavaScript execution engine
 - `./clients/bin/faas-cli` - Command-line interface
 
-### 2. Deploy Contracts
+### 2. Deploy Contracts and Start Devnet
 
-Deploy the FaaS system contracts to your target network:
+Deploy the FaaS system contracts and start a local development network:
 
 ```bash
-# Using Foundry
-cd contracts
-forge script script/DeployMyContracts.s.sol --broadcast --rpc-url <RPC_URL> --private-key <PRIVATE_KEY>
+devkit avs devnet start --skip-avs-run --port 7545
 ```
 
-Contract addresses will be automatically embedded in the CLI for convenience.
+This command:
+- Starts a local Ethereum network on port 7545
+- Deploys all required contracts (TaskMailbox, FaaS, etc.)
+- Sets up operator infrastructure
+- Contract addresses are automatically embedded in the CLI
 
 ### 3. Start the Performer
 
 The performer handles JavaScript execution for operators:
 
 ```bash
-./bin/performer
+devkit avs run
 ```
 
 ## Using the CLI
@@ -127,8 +135,16 @@ faas-cli deploy-function \
 
 Output:
 ```
+Deploying function from directory: ./my-function
+Tarball size: 324 bytes
+Using chain ID: 31337
+Transaction sent: 0xabcdef1234567890...
+Waiting for confirmation...
 Function registered successfully!
 Function ID: 0x1234567890abcdef...
+Gas used: 125847
+Gas price: 20.00 gwei
+Transaction cost: 0.002517 ETH
 ```
 
 ### Call a Function
@@ -144,7 +160,15 @@ faas-cli call-function \
 
 Output:
 ```
+Calling function: 0x1234567890abcdef...
+Arguments: ["Hello, World!"]
+Transaction sent: 0xfedcba0987654321...
+Waiting for confirmation...
 Task ID: 0xabcdef1234567890...
+Gas used: 68432
+Gas price: 20.00 gwei
+Transaction cost: 0.001369 ETH
+Connected to WebSocket RPC: ws://localhost:7545
 Listening for TaskVerified event...
 Subscribed to TaskVerified events for task 0xabcdef1234567890...
 
@@ -315,11 +339,10 @@ Display embedded contract configuration.
 
 ### Local Testing
 
-1. Start local blockchain (Ganache, Hardhat, etc.)
-2. Deploy contracts to local network
-3. Update CLI configuration or use flags
-4. Start performer: `./bin/performer`
-5. Deploy and test functions
+1. Build the project: `devkit avs build`
+2. Start local devnet: `devkit avs devnet start --skip-avs-run --port 7545`
+3. Start performer: `devkit avs run`
+4. Deploy and test functions using the CLI
 
 ### Docker Development
 
