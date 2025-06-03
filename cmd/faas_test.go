@@ -12,11 +12,12 @@ import (
 )
 
 // Helper function to encode a FunctionCall struct as Solidity would
-func encodeFunctionCallStructLocal(fn []byte, fnId [32]byte, input []byte) ([]byte, error) {
+func encodeFunctionCallStructLocal(fn []byte, fnId [32]byte, input []byte, url string) ([]byte, error) {
 	functionCallType, err := abi.NewType("tuple", "FunctionCall", []abi.ArgumentMarshaling{
 		{Name: "fn", Type: "bytes"},
 		{Name: "fnId", Type: "bytes32"},
 		{Name: "input", Type: "bytes"},
+		{Name: "url", Type: "string"},
 	})
 	if err != nil {
 		return nil, err
@@ -30,10 +31,12 @@ func encodeFunctionCallStructLocal(fn []byte, fnId [32]byte, input []byte) ([]by
 		Fn    []byte   `abi:"fn"`
 		FnId  [32]byte `abi:"fnId"`
 		Input []byte   `abi:"input"`
+		Url   string   `abi:"url"`
 	}{
 		Fn:    fn,
 		FnId:  fnId,
 		Input: input,
+		Url:   url,
 	}
 
 	return functionCallArgs.Pack(structValue)
@@ -48,7 +51,7 @@ func TestTaskWorker_ValidateTask(t *testing.T) {
 	input := []byte(`["arg1", "arg2"]`)
 
 	// Encode using ABI tuple structure
-	payload, err := encodeFunctionCallStructLocal(fn, fnId, input)
+	payload, err := encodeFunctionCallStructLocal(fn, fnId, input, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,7 +91,7 @@ func TestTaskWorker_ValidateTask_EmptyFunction(t *testing.T) {
 	input := []byte(`["arg1", "arg2"]`)
 
 	// Encode using ABI tuple structure
-	payload, err := encodeFunctionCallStructLocal(fn, fnId, input)
+	payload, err := encodeFunctionCallStructLocal(fn, fnId, input, "")
 	if err != nil {
 		t.Fatal(err)
 	}

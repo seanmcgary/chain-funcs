@@ -49,7 +49,9 @@ contract FaaSTest is Test {
         bytes32 functionId = faas.registerFunction(functionContent);
         
         assertEq(functionId, keccak256(functionContent));
-        assertEq(faas.getFunction(functionId), functionContent);
+        FaaS.Function memory func = faas.getFunction(functionId);
+        assertEq(func.content, functionContent);
+        assertEq(func.url, "");
     }
     
     function testCallFunction() public {
@@ -107,6 +109,53 @@ contract FaaSTest is Test {
         faas.callFunction(functionId, arguments);
     }
     
+    function testDeployFunction() public {
+        string memory url = "https://example.com/function.tar.gz";
+        bytes32 digest = keccak256("dummy content");
+        
+        vm.prank(user);
+        bytes32 functionId = faas.deployFunction(url, digest);
+        
+        assertEq(functionId, digest);
+        FaaS.Function memory func = faas.getFunction(functionId);
+        assertEq(func.content, "");
+        assertEq(func.url, url);
+    }
+    
+    function testFunctionDeployedEvent() public {
+        string memory url = "https://example.com/function.tar.gz";
+        bytes32 digest = keccak256("dummy content");
+        
+        vm.expectEmit(true, true, true, true);
+        emit FaaS.FunctionDeployed(digest, url, digest, user);
+        
+        vm.prank(user);
+        faas.deployFunction(url, digest);
+    }
+    
+    function testCallRemoteFunction() public {
+        string memory url = "https://example.com/function.tar.gz";
+        bytes32 digest = keccak256("dummy content");
+        bytes memory arguments = abi.encode([1, 2, 3]);
+        
+        vm.prank(user);
+        bytes32 functionId = faas.deployFunction(url, digest);
+        
+        vm.prank(user);
+        bytes32 taskHash = faas.callFunction(functionId, arguments);
+        
+        assertTrue(taskHash != bytes32(0));
+        
+        bytes memory taskPayload = mockTaskMailbox.tasks(taskHash);
+        assertTrue(taskPayload.length > 0);
+        
+        FaaS.FunctionCall memory call = abi.decode(taskPayload, (FaaS.FunctionCall));
+        assertEq(call.fn, "");
+        assertEq(call.fnId, functionId);
+        assertEq(call.input, arguments);
+        assertEq(call.url, url);
+    }
+
     function testConstructorParameters() public view {
         assertEq(address(faas.taskMailbox()), address(mockTaskMailbox));
         assertEq(faas.avs(), mockAvs);

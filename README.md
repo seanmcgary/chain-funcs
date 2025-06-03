@@ -81,9 +81,11 @@ devkit avs run
 
 ## Using the CLI
 
-The `faas-cli` provides an AWS Lambda-like experience for deploying and calling functions.
+The `faas-cli` provides an AWS Lambda-like experience for deploying and calling functions with support for both JavaScript and Python runtimes.
 
 ### Deploy a Function
+
+#### JavaScript Functions
 
 Create a directory with your JavaScript function:
 
@@ -125,6 +127,54 @@ exports.handler = async function(input) {
 };
 ```
 
+#### Python Functions
+
+Create a directory with your Python function:
+
+```bash
+mkdir my-python-function
+cd my-python-function
+```
+
+Create `handler.py` with a handler function:
+
+```python
+def handler(input_data):
+    """
+    Python function handler
+    
+    Args:
+        input_data: The input data from the function call
+        
+    Returns:
+        The result of the function execution
+    """
+    print(f"Python function called with: {input_data}")
+    
+    # Handle different input types
+    if isinstance(input_data, dict) and 'name' in input_data:
+        return {
+            "message": f"Hello, {input_data['name']}! This is from Python.",
+            "language": "python",
+            "input": input_data
+        }
+    elif isinstance(input_data, dict) and 'raw' in input_data:
+        # Binary input
+        return {
+            "message": "Processed binary data with Python",
+            "size": len(input_data['raw']),
+            "type": "binary"
+        }
+    else:
+        # Simple string or other input
+        return {
+            "message": f"Echo from Python: {input_data}",
+            "language": "python"
+        }
+```
+
+#### Local Deployment
+
 Deploy the function:
 
 ```bash
@@ -133,10 +183,50 @@ faas-cli deploy-function \
   ./my-function
 ```
 
-Output:
+#### Remote Deployment (S3)
+
+For larger functions or production deployments, use S3 storage:
+
+```bash
+# Deploy JavaScript function to S3
+faas-cli deploy-function \
+  --private-key <YOUR_PRIVATE_KEY> \
+  --s3-base-url s3://my-bucket/functions/ \
+  ./my-function
+
+# Deploy Python function to S3
+faas-cli deploy-function \
+  --private-key <YOUR_PRIVATE_KEY> \
+  --s3-base-url s3://my-bucket/functions/ \
+  ./my-python-function
+```
+
+**Prerequisites for S3 deployment:**
+- AWS CLI configured with credentials
+- S3 bucket with appropriate permissions
+- Functions are downloaded by operators at runtime
+
+Output (S3 deployment):
 ```
 Deploying function from directory: ./my-function
 Tarball size: 324 bytes
+Function ID: 0x1234567890abcdef...
+Using chain ID: 31337
+Uploaded to S3: https://my-bucket.s3.amazonaws.com/functions/0x1234567890abcdef....tar.gz
+Transaction sent: 0xabcdef1234567890...
+Waiting for confirmation...
+Function registered successfully!
+Function ID: 0x1234567890abcdef...
+Gas used: 68432
+Gas price: 20.00 gwei
+Transaction cost: 0.001369 ETH
+```
+
+Output (Local deployment):
+```
+Deploying function from directory: ./my-function
+Tarball size: 324 bytes
+Function ID: 0x1234567890abcdef...
 Using chain ID: 31337
 Transaction sent: 0xabcdef1234567890...
 Waiting for confirmation...
@@ -204,13 +294,34 @@ FaaS Address: 0x240A60DC5e0B9013Cb8CF39aa6f9dDd8f25E40D2
 
 ### Handler Function
 
-All functions must export a `handler` function:
+#### JavaScript Functions
+
+All JavaScript functions must export a `handler` function:
 
 ```javascript
 exports.handler = async function(input) {
     // Your logic here
     return result;
 };
+```
+
+#### Python Functions
+
+All Python functions must define a `handler` function:
+
+```python
+def handler(input_data):
+    """
+    Function handler
+    
+    Args:
+        input_data: The input data from the function call
+        
+    Returns:
+        The result of the function execution
+    """
+    # Your logic here
+    return result
 ```
 
 ### Input Handling
@@ -266,6 +377,8 @@ Logs appear in the result payload:
 
 ### Dependencies
 
+#### JavaScript Dependencies
+
 Include `package.json` for npm dependencies:
 
 ```json
@@ -285,6 +398,62 @@ exports.handler = async function(input) {
 };
 ```
 
+#### Python Dependencies
+
+For Python functions with external dependencies, include `requirements.txt`:
+
+```txt
+requests==2.31.0
+numpy==1.24.0
+beautifulsoup4==4.12.0
+```
+
+**How it works:**
+1. The CLI automatically detects Python functions (`handler.py` present)
+2. If `requirements.txt` exists, dependencies are installed using `pip3 install --target`
+3. Dependencies are bundled into the function tarball
+4. The Python runner adds the function directory to `sys.path` to find packages
+
+```python
+import requests
+import numpy as np
+from bs4 import BeautifulSoup
+
+def handler(input_data):
+    # Use external libraries - they're automatically bundled
+    response = requests.get('https://httpbin.org/json')
+    data = np.array([1, 2, 3, 4, 5])
+    
+    return {
+        "message": "Using bundled dependencies",
+        "mean": float(np.mean(data)),
+        "api_status": response.status_code,
+        "packages": ["requests", "numpy", "beautifulsoup4"],
+        "input": input_data
+    }
+```
+
+**Deployment with dependencies:**
+```bash
+# Dependencies are automatically installed and bundled
+faas-cli deploy-function \
+  --private-key <YOUR_PRIVATE_KEY> \
+  ./my-python-function
+
+# Skip dependency installation (for functions without requirements.txt)
+faas-cli deploy-function \
+  --private-key <YOUR_PRIVATE_KEY> \
+  --skip-deps \
+  ./my-simple-python-function
+```
+
+**Notes:**
+- Requires `pip3` to be available in your environment
+- Dependencies are installed to a temporary directory and bundled into the tarball
+- Works with both local and S3 deployment
+- Use `--skip-deps` to skip dependency installation for functions without external packages
+- Dependencies are isolated per function and don't affect your local Python environment
+
 ## CLI Reference
 
 ### Global Flags
@@ -294,19 +463,45 @@ exports.handler = async function(input) {
 - `--private-key`: Private key for transactions (required)
 - `--faas-address`: FaaS contract address (defaults to embedded)
 - `--taskmailbox-address`: TaskMailbox address (defaults to embedded)
+- `--s3-base-url`: S3 base URL for remote deployment (deploy-function only)
+- `--skip-deps`: Skip Python dependency installation (deploy-function only)
 
 ### Commands
 
 #### `deploy-function <directory>`
 
-Deploy a JavaScript function from a directory.
+Deploy a JavaScript or Python function from a directory.
 
-**Example:**
+**Local deployment:**
 ```bash
 faas-cli deploy-function \
   --private-key 0x123... \
   --rpc-url https://mainnet.infura.io/v3/... \
   ./my-function
+```
+
+**S3 deployment:**
+```bash
+faas-cli deploy-function \
+  --private-key 0x123... \
+  --rpc-url https://mainnet.infura.io/v3/... \
+  --s3-base-url s3://my-bucket/functions/ \
+  ./my-function
+```
+
+**Python function with dependencies:**
+```bash
+faas-cli deploy-function \
+  --private-key 0x123... \
+  ./my-python-function-with-deps
+```
+
+**Skip dependency installation:**
+```bash
+faas-cli deploy-function \
+  --private-key 0x123... \
+  --skip-deps \
+  ./my-simple-python-function
 ```
 
 #### `call-function <input>`

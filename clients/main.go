@@ -20,8 +20,8 @@ func main() {
 		Usage: "CLI for interacting with the FaaS AVS contract",
 		Commands: []*cli.Command{
 			{
-				Name:  "deploy-function",
-				Usage: "Deploy a JavaScript function to the FaaS contract",
+				Name:  "register-function",
+				Usage: "Register a JavaScript or Python function with content stored on-chain",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "rpc-url",
@@ -40,6 +40,48 @@ func main() {
 						Usage:    "FaaS contract address",
 						Value:    config.GetFaaSAddress(),
 						EnvVars:  []string{"FAAS_ADDRESS"},
+					},
+					&cli.BoolFlag{
+						Name:    "skip-deps",
+						Usage:   "Skip dependency installation for Python functions",
+						EnvVars: []string{"SKIP_DEPS"},
+					},
+				},
+				ArgsUsage: "<function-directory>",
+				Action:    registerFunction,
+			},
+			{
+				Name:  "deploy-function",
+				Usage: "Deploy a JavaScript or Python function with content stored remotely in S3",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "rpc-url",
+						Usage:    "Ethereum RPC URL",
+						Value:    config.GetDefaultRPCURL(),
+						EnvVars:  []string{"RPC_URL"},
+					},
+					&cli.StringFlag{
+						Name:     "private-key",
+						Usage:    "Private key for signing transactions",
+						Required: true,
+						EnvVars:  []string{"PRIVATE_KEY"},
+					},
+					&cli.StringFlag{
+						Name:     "faas-address",
+						Usage:    "FaaS contract address",
+						Value:    config.GetFaaSAddress(),
+						EnvVars:  []string{"FAAS_ADDRESS"},
+					},
+					&cli.StringFlag{
+						Name:     "s3-base-url",
+						Usage:    "S3 base URL for remote deployment (e.g., s3://bucket-name/path/)",
+						Required: true,
+						EnvVars:  []string{"S3_BASE_URL"},
+					},
+					&cli.BoolFlag{
+						Name:    "skip-deps",
+						Usage:   "Skip dependency installation for Python functions",
+						EnvVars: []string{"SKIP_DEPS"},
 					},
 				},
 				ArgsUsage: "<function-directory>",

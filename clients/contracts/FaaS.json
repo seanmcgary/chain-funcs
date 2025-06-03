@@ -3,189 +3,299 @@
   "address": "0x240A60DC5e0B9013Cb8CF39aa6f9dDd8f25E40D2",
   "abi": [
     {
+      "type": "constructor",
       "inputs": [
         {
-          "internalType": "address",
           "name": "_taskMailbox",
-          "type": "address"
+          "type": "address",
+          "internalType": "address"
         },
         {
-          "internalType": "address",
           "name": "_avs",
-          "type": "address"
+          "type": "address",
+          "internalType": "address"
         },
         {
-          "internalType": "uint32",
           "name": "_executorOperatorSetId",
-          "type": "uint32"
+          "type": "uint32",
+          "internalType": "uint32"
         }
       ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
+      "stateMutability": "nonpayable"
     },
     {
-      "inputs": [],
+      "type": "function",
       "name": "avs",
+      "inputs": [],
       "outputs": [
         {
-          "internalType": "address",
           "name": "",
-          "type": "address"
+          "type": "address",
+          "internalType": "address"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
+      "stateMutability": "view"
     },
     {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "functionId",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "bytes",
-          "name": "arguments",
-          "type": "bytes"
-        }
-      ],
+      "type": "function",
       "name": "callFunction",
-      "outputs": [
+      "inputs": [
         {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
+          "name": "functionId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "arguments",
+          "type": "bytes",
+          "internalType": "bytes"
         }
       ],
-      "stateMutability": "nonpayable",
-      "type": "function"
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable"
     },
     {
-      "inputs": [],
+      "type": "function",
+      "name": "deployFunction",
+      "inputs": [
+        {
+          "name": "url",
+          "type": "string",
+          "internalType": "string"
+        },
+        {
+          "name": "digest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
       "name": "executorOperatorSetId",
-      "outputs": [
-        {
-          "internalType": "uint32",
-          "name": "",
-          "type": "uint32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "name": "functions",
-      "outputs": [
-        {
-          "internalType": "bytes",
-          "name": "",
-          "type": "bytes"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "functionId",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getFunction",
-      "outputs": [
-        {
-          "internalType": "bytes",
-          "name": "",
-          "type": "bytes"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes",
-          "name": "content",
-          "type": "bytes"
-        }
-      ],
-      "name": "registerFunction",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
-      "name": "taskMailbox",
       "outputs": [
         {
-          "internalType": "contract ITaskMailbox",
           "name": "",
-          "type": "address"
+          "type": "uint32",
+          "internalType": "uint32"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
+      "stateMutability": "view"
     },
     {
-      "anonymous": false,
+      "type": "function",
+      "name": "functions",
       "inputs": [
         {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "functionId",
-          "type": "bytes32"
-        },
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "taskId",
-          "type": "bytes32"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "caller",
-          "type": "address"
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
         }
       ],
+      "outputs": [
+        {
+          "name": "content",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        {
+          "name": "url",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getFunction",
+      "inputs": [
+        {
+          "name": "functionId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "tuple",
+          "internalType": "struct FaaS.Function",
+          "components": [
+            {
+              "name": "content",
+              "type": "bytes",
+              "internalType": "bytes"
+            },
+            {
+              "name": "url",
+              "type": "string",
+              "internalType": "string"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getFunctionContent",
+      "inputs": [
+        {
+          "name": "functionId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getFunctionUrl",
+      "inputs": [
+        {
+          "name": "functionId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "registerFunction",
+      "inputs": [
+        {
+          "name": "content",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "taskMailbox",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract ITaskMailbox"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "event",
       "name": "FunctionCalled",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
-          "internalType": "bytes32",
           "name": "functionId",
-          "type": "bytes32"
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
         },
         {
+          "name": "taskId",
+          "type": "bytes32",
           "indexed": true,
-          "internalType": "address",
-          "name": "registrar",
-          "type": "address"
+          "internalType": "bytes32"
+        },
+        {
+          "name": "caller",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
         }
       ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "FunctionDeployed",
+      "inputs": [
+        {
+          "name": "functionId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "url",
+          "type": "string",
+          "indexed": true,
+          "internalType": "string"
+        },
+        {
+          "name": "digest",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "registrar",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
       "name": "FunctionRegistered",
-      "type": "event"
+      "inputs": [
+        {
+          "name": "functionId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "registrar",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        }
+      ],
+      "anonymous": false
     }
   ]
 }

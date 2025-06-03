@@ -9,15 +9,22 @@ contract FaaS {
     address public immutable avs;
     uint32 public executorOperatorSetId;
     
-    mapping(bytes32 => bytes) public functions;
+    struct Function {
+        bytes content;
+        string url;
+    }
+    
+    mapping(bytes32 => Function) public functions;
     
     event FunctionRegistered(bytes32 indexed functionId, address indexed registrar);
+    event FunctionDeployed(bytes32 indexed functionId, string indexed url, bytes32 indexed digest, address registrar);
     event FunctionCalled(bytes32 indexed functionId, bytes32 indexed taskId, address indexed caller);
     
     struct FunctionCall {
         bytes fn;
         bytes32 fnId;
         bytes input;
+        string url;
     }
     
     constructor(address _taskMailbox, address _avs, uint32 _executorOperatorSetId) {
@@ -28,19 +35,35 @@ contract FaaS {
     
     function registerFunction(bytes memory content) external returns (bytes32) {
         bytes32 functionId = keccak256(content);
-        functions[functionId] = content;
+        functions[functionId] = Function({
+            content: content,
+            url: ""
+        });
         
         emit FunctionRegistered(functionId, msg.sender);
         return functionId;
     }
     
+    function deployFunction(string memory url, bytes32 digest) external returns (bytes32) {
+        bytes32 functionId = digest;
+        functions[functionId] = Function({
+            content: "",
+            url: url
+        });
+        
+        emit FunctionDeployed(functionId, url, digest, msg.sender);
+        return functionId;
+    }
+    
     function callFunction(bytes32 functionId, bytes memory arguments) external returns (bytes32) {
-        require(functions[functionId].length > 0, "Function not found");
+        Function memory func = functions[functionId];
+        require(func.content.length > 0 || bytes(func.url).length > 0, "Function not found");
         
         FunctionCall memory call = FunctionCall({
-            fn: functions[functionId],
+            fn: func.content,
             fnId: functionId,
-            input: arguments
+            input: arguments,
+            url: func.url
         });
         
         bytes memory payload = abi.encode(call);
@@ -63,7 +86,15 @@ contract FaaS {
         return taskHash;
     }
     
-    function getFunction(bytes32 functionId) external view returns (bytes memory) {
+    function getFunction(bytes32 functionId) external view returns (Function memory) {
         return functions[functionId];
+    }
+    
+    function getFunctionContent(bytes32 functionId) external view returns (bytes memory) {
+        return functions[functionId].content;
+    }
+    
+    function getFunctionUrl(bytes32 functionId) external view returns (string memory) {
+        return functions[functionId].url;
     }
 }

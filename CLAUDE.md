@@ -78,8 +78,31 @@ This is **fass-avs**, a Function-as-a-Service (FaaS) Autonomous Verifiable Servi
 
 ## FaaS Function Format
 
-JavaScript functions must:
+All functions must:
 - Be packaged as gzipped tarballs
-- Contain `index.js` at the root with `exports.handler = async function(args = []) { ... }`
-- Include all dependencies (node_modules) in the tarball
+- **Contain `manifest.json` at the root specifying the runtime**
+- Include all dependencies in the tarball
 - Return JSON-serializable results
+
+### Required Files:
+
+#### manifest.json (Required)
+```json
+{
+  "runtime": "javascript"
+}
+```
+or
+```json
+{
+  "runtime": "python"
+}
+```
+
+#### JavaScript Functions:
+- Contain `index.js` at the root with `exports.handler = async function(args = []) { ... }`
+- Include node_modules if dependencies are needed
+
+#### Python Functions:
+- Contain `handler.py` at the root with `def handler(args): ...`
+- Include requirements.txt and any dependencies needed

@@ -5,19 +5,21 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"reflect"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/Layr-Labs/hourglass-monorepo/ponos/pkg/performer/server"
 	performerV1 "github.com/Layr-Labs/protocol-apis/gen/protos/eigenlayer/hourglass/v1/performer"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"go.uber.org/zap"
 )
 
@@ -29,7 +31,7 @@ import (
 // Aggregator to place in the outbox once the signing threshold is met.
 
 type TaskWorker struct {
-	logger              *zap.Logger
+	logger                *zap.Logger
 	functionCallArguments abi.Arguments
 }
 
@@ -37,6 +39,7 @@ type FunctionCall struct {
 	Fn    []byte   `json:"fn"`
 	FnId  [32]byte `json:"fnId"`
 	Input []byte   `json:"input"`
+	Url   string   `json:"url"`
 }
 
 type ExecutionResult struct {
@@ -51,17 +54,18 @@ func NewTaskWorker(logger *zap.Logger) *TaskWorker {
 		{Name: "fn", Type: "bytes"},
 		{Name: "fnId", Type: "bytes32"},
 		{Name: "input", Type: "bytes"},
+		{Name: "url", Type: "string"},
 	})
 	if err != nil {
 		logger.Fatal("Failed to create FunctionCall tuple type", zap.Error(err))
 	}
-	
+
 	functionCallArgs := abi.Arguments{
 		{Type: functionCallType, Name: "call"},
 	}
-	
+
 	return &TaskWorker{
-		logger:              logger,
+		logger:                logger,
 		functionCallArguments: functionCallArgs,
 	}
 }
@@ -76,8 +80,8 @@ func (tw *TaskWorker) ValidateTask(t *performerV1.TaskRequest) error {
 		return fmt.Errorf("invalid function call payload: %w", err)
 	}
 
-	if len(call.Fn) == 0 {
-		return fmt.Errorf("function content is empty")
+	if len(call.Fn) == 0 && len(call.Url) == 0 {
+		return fmt.Errorf("task must specify either a function or a URL")
 	}
 
 	if len(call.Input) == 0 {
@@ -97,9 +101,9 @@ func (tw *TaskWorker) HandleTask(t *performerV1.TaskRequest) (*performerV1.TaskR
 		return nil, fmt.Errorf("invalid function call payload: %w", err)
 	}
 
-	result, err := tw.executeJavaScriptFunction(call)
+	result, err := tw.executeFunction(call)
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute JavaScript function: %w", err)
+		return nil, fmt.Errorf("failed to execute function: %w", err)
 	}
 
 	resultBytes, err := json.Marshal(result)
@@ -128,7 +132,7 @@ func (tw *TaskWorker) decodeFunctionCall(payload []byte) (*FunctionCall, error) 
 	// The ABI library automatically creates a struct for tuple types
 	// Use reflection to extract the fields
 	tupleStruct := values[0]
-	
+
 	// Use reflection to access the fields
 	v := reflect.ValueOf(tupleStruct)
 	if v.Kind() != reflect.Struct {
@@ -146,7 +150,7 @@ func (tw *TaskWorker) decodeFunctionCall(payload []byte) (*FunctionCall, error) 
 	if !fnIdField.IsValid() {
 		return nil, fmt.Errorf("fnId field not found")
 	}
-	
+
 	// Extract [32]byte array directly
 	var fnId [32]byte
 	if fnIdField.Kind() == reflect.Array && fnIdField.Len() == 32 {
@@ -163,25 +167,47 @@ func (tw *TaskWorker) decodeFunctionCall(payload []byte) (*FunctionCall, error) 
 	}
 	input := inputField.Bytes()
 
+	urlField := v.FieldByName("Url")
+	if !urlField.IsValid() {
+		return nil, fmt.Errorf("url field not found")
+	}
+	url := urlField.String()
+
 	return &FunctionCall{
 		Fn:    fn,
 		FnId:  fnId,
 		Input: input,
+		Url:   url,
 	}, nil
 }
 
-func (tw *TaskWorker) executeJavaScriptFunction(call *FunctionCall) (*ExecutionResult, error) {
+func (tw *TaskWorker) executeFunction(call *FunctionCall) (*ExecutionResult, error) {
+	tw.logger.Sugar().Infow("Executing function",
+		zap.String("functionId", fmt.Sprintf("%x", call.FnId)),
+		zap.Int("inputLength", len(call.Input)),
+		zap.Int("fnLength", len(call.Fn)),
+		zap.String("url", call.Url),
+	)
 	// Convert function ID to hex string for directory name
 	functionId := fmt.Sprintf("%x", call.FnId)
 	functionDir := filepath.Join("/tmp/functions", functionId)
-	
+
 	if err := os.MkdirAll(functionDir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create function directory: %w", err)
 	}
 	defer os.RemoveAll(functionDir)
 
-	if err := tw.extractTarball(call.Fn, functionDir); err != nil {
-		return nil, fmt.Errorf("failed to extract function tarball: %w", err)
+	// Handle remote URL or embedded content
+	if call.Url != "" {
+		// Use remote URL
+		if err := tw.downloadAndExtractFunction(call.Url, functionDir); err != nil {
+			return nil, fmt.Errorf("failed to download and extract function: %w", err)
+		}
+	} else {
+		// Use embedded content
+		if err := tw.extractTarball(call.Fn, functionDir); err != nil {
+			return nil, fmt.Errorf("failed to extract function tarball: %w", err)
+		}
 	}
 
 	// Debug: list extracted files
@@ -193,32 +219,45 @@ func (tw *TaskWorker) executeJavaScriptFunction(call *FunctionCall) (*ExecutionR
 	// Pass raw input data as base64 to preserve binary data
 	inputBase64 := base64.StdEncoding.EncodeToString(call.Input)
 
-	// Try to find the js-runner.js script
-	scriptPath := "/app/scripts/js-runner.js"
-	if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
-		// Try relative path
-		scriptPath = "./scripts/js-runner.js"
-		if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
-			return nil, fmt.Errorf("js-runner.js not found at /app/scripts/js-runner.js or ./scripts/js-runner.js")
-		}
+	// Detect runtime based on files present
+	runtime, err := tw.detectRuntime(functionDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to detect runtime: %w", err)
 	}
 
-	tw.logger.Sugar().Infof("Executing: node %s %s <base64-encoded-input>", scriptPath, functionDir)
-	
-	cmd := exec.Command("node", scriptPath, functionDir, inputBase64)
+	var cmd *exec.Cmd
+	switch runtime {
+	case "javascript":
+		scriptPath, err := tw.findScript("js-runner.js")
+		if err != nil {
+			return nil, err
+		}
+		tw.logger.Sugar().Infof("Executing JavaScript: node %s %s <base64-encoded-input>", scriptPath, functionDir)
+		cmd = exec.Command("node", scriptPath, functionDir, inputBase64)
+	case "python":
+		scriptPath, err := tw.findScript("py-runner.py")
+		if err != nil {
+			return nil, err
+		}
+		tw.logger.Sugar().Infof("Executing Python: python3 %s %s <base64-encoded-input>", scriptPath, functionDir)
+		cmd = exec.Command("python3", scriptPath, functionDir, inputBase64)
+	default:
+		return nil, fmt.Errorf("unsupported runtime: %s", runtime)
+	}
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
-	
+
 	err = cmd.Run()
 	if err != nil {
-		tw.logger.Error("JavaScript execution failed", 
+		tw.logger.Error("Function execution failed",
+			zap.String("runtime", runtime),
 			zap.String("stderr", stderr.String()),
 			zap.String("stdout", stdout.String()),
 			zap.Error(err))
-		return nil, fmt.Errorf("failed to execute JavaScript function: %w", err)
+		return nil, fmt.Errorf("failed to execute %s function: %w", runtime, err)
 	}
-	
+
 	output := stdout.Bytes()
 
 	// Debug: log the raw output to see what's being returned
@@ -251,7 +290,7 @@ func (tw *TaskWorker) extractTarball(tarballData []byte, destDir string) error {
 		}
 
 		destPath := filepath.Join(destDir, header.Name)
-		
+
 		if !filepath.HasPrefix(destPath, destDir) {
 			return fmt.Errorf("invalid file path: %s", header.Name)
 		}
@@ -280,6 +319,110 @@ func (tw *TaskWorker) extractTarball(tarballData []byte, destDir string) error {
 	}
 
 	return nil
+}
+
+// downloadAndExtractFunction downloads a tarball from URL and extracts it
+func (tw *TaskWorker) downloadAndExtractFunction(url, destDir string) error {
+	tw.logger.Sugar().Infow("Downloading and extracting function",
+		zap.String("url", url),
+		zap.String("destDir", destDir),
+	)
+	// Create a persistent cache directory for downloaded functions
+	cacheDir := filepath.Join("/tmp/function-cache")
+	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+		return fmt.Errorf("failed to create cache directory: %w", err)
+	}
+
+	// Use URL hash as cache key
+	urlHash := fmt.Sprintf("%x", sha256.Sum256([]byte(url)))
+	cachedPath := filepath.Join(cacheDir, urlHash+".tar.gz")
+
+	// Check if already cached
+	if _, err := os.Stat(cachedPath); err == nil {
+		tw.logger.Sugar().Infof("Using cached function from %s", cachedPath)
+		return tw.extractTarballFromFile(cachedPath, destDir)
+	}
+
+	// Download the tarball
+	tw.logger.Sugar().Infof("Downloading function from %s", url)
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("failed to download function: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to download function: HTTP %d", resp.StatusCode)
+	}
+
+	// Read the content
+	content, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	// Cache the downloaded content
+	if err := os.WriteFile(cachedPath, content, 0644); err != nil {
+		tw.logger.Sugar().Warnf("Failed to cache downloaded function: %v", err)
+		// Continue execution even if caching fails
+	}
+
+	// Extract directly from memory
+	return tw.extractTarball(content, destDir)
+}
+
+// extractTarballFromFile extracts a tarball from a file path
+func (tw *TaskWorker) extractTarballFromFile(filePath, destDir string) error {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to read cached file: %w", err)
+	}
+	return tw.extractTarball(content, destDir)
+}
+
+// detectRuntime determines the function runtime based on manifest.json
+func (tw *TaskWorker) detectRuntime(functionDir string) (string, error) {
+	manifestPath := filepath.Join(functionDir, "manifest.json")
+
+	// Check if manifest.json exists
+	manifestData, err := os.ReadFile(manifestPath)
+	if err != nil {
+		return "", fmt.Errorf("manifest.json not found in function directory: %w", err)
+	}
+
+	// Parse manifest.json
+	var manifest struct {
+		Runtime string `json:"runtime"`
+	}
+
+	if err := json.Unmarshal(manifestData, &manifest); err != nil {
+		return "", fmt.Errorf("failed to parse manifest.json: %w", err)
+	}
+
+	// Validate runtime
+	switch manifest.Runtime {
+	case "javascript", "python":
+		return manifest.Runtime, nil
+	default:
+		return "", fmt.Errorf("unsupported runtime in manifest.json: %s (supported: javascript, python)", manifest.Runtime)
+	}
+}
+
+// findScript locates the runner script, trying both app and relative paths
+func (tw *TaskWorker) findScript(scriptName string) (string, error) {
+	// Try app path first (for containerized deployment)
+	appPath := fmt.Sprintf("/app/scripts/%s", scriptName)
+	if _, err := os.Stat(appPath); err == nil {
+		return appPath, nil
+	}
+
+	// Try relative path (for local development)
+	relativePath := fmt.Sprintf("./scripts/%s", scriptName)
+	if _, err := os.Stat(relativePath); err == nil {
+		return relativePath, nil
+	}
+
+	return "", fmt.Errorf("%s not found at /app/scripts/%s or ./scripts/%s", scriptName, scriptName, scriptName)
 }
 
 func main() {

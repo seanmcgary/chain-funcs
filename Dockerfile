@@ -20,7 +20,9 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=build /build/bin/performer /usr/local/bin/performer
 COPY --from=build /build/scripts/js-runner.js /app/scripts/js-runner.js
+COPY --from=build /build/scripts/py-runner.py /app/scripts/py-runner.py
 
 RUN chmod +x /app/scripts/js-runner.js
+RUN chmod +x /app/scripts/py-runner.py
 
 CMD ["/usr/local/bin/performer"]

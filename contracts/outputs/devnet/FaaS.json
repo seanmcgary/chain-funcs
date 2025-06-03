@@ -61,6 +61,30 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "url",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "digest",
+          "type": "bytes32"
+        }
+      ],
+      "name": "deployFunction",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "executorOperatorSetId",
       "outputs": [
@@ -85,8 +109,13 @@
       "outputs": [
         {
           "internalType": "bytes",
-          "name": "",
+          "name": "content",
           "type": "bytes"
+        },
+        {
+          "internalType": "string",
+          "name": "url",
+          "type": "string"
         }
       ],
       "stateMutability": "view",
@@ -103,9 +132,59 @@
       "name": "getFunction",
       "outputs": [
         {
+          "components": [
+            {
+              "internalType": "bytes",
+              "name": "content",
+              "type": "bytes"
+            },
+            {
+              "internalType": "string",
+              "name": "url",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct FaaS.Function",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getFunctionContent",
+      "outputs": [
+        {
           "internalType": "bytes",
           "name": "",
           "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getFunctionUrl",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
         }
       ],
       "stateMutability": "view",
@@ -166,6 +245,37 @@
         }
       ],
       "name": "FunctionCalled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "url",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "digest",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "registrar",
+          "type": "address"
+        }
+      ],
+      "name": "FunctionDeployed",
       "type": "event"
     },
     {
