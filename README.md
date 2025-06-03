@@ -1,12 +1,12 @@
-# JavaScript Function-as-a-Service (FaaS) AVS
+# Function-as-a-Service (FaaS) AVS
 
-A serverless JavaScript execution platform built on EigenLayer's Hourglass framework, providing AWS Lambda-like functionality on a decentralized infrastructure.
+A serverless multi-runtime execution platform built on EigenLayer's Hourglass framework, providing AWS Lambda-like functionality on a decentralized infrastructure.
 
 ## Overview
 
-This AVS (Autonomous Verifiable Service) enables users to deploy and execute JavaScript functions on-demand through a decentralized network of operators. It provides:
+This AVS (Autonomous Verifiable Service) enables users to deploy and execute functions in multiple runtimes on-demand through a decentralized network of operators. It provides:
 
-- **Serverless JavaScript execution** with Node.js runtime
+- **Multi-runtime serverless execution** with JavaScript (Node.js) and Python support
 - **Arbitrary input support** - JSON, binary data, text, or any format
 - **Automatic scaling** through EigenLayer's operator network
 - **Verifiable computation** with cryptographic proofs
@@ -20,15 +20,15 @@ This AVS (Autonomous Verifiable Service) enables users to deploy and execute Jav
 - **BN254CertificateVerifier**: Validates operator signatures and stake requirements
 
 ### Off-Chain Components
-- **Performer**: Go-based JavaScript execution engine using Node.js
+- **Performer**: Go-based multi-runtime execution engine supporting JavaScript (Node.js) and Python
 - **Aggregator**: Distributes tasks to operators and aggregates results
 - **Executor**: Manages task execution and signs results with BLS keys
 
 ### Execution Flow
-1. User deploys JavaScript function as gzipped tarball via CLI
+1. User deploys function (JavaScript or Python) as gzipped tarball with manifest.json via CLI
 2. Function is stored on-chain with unique ID
 3. Function calls create tasks in the TaskMailbox
-4. Operators execute functions in isolated Node.js environments
+4. Operators execute functions in isolated runtime environments (Node.js or Python)
 5. Results are aggregated and verified before returning to caller
 
 ## Quick Start
@@ -54,7 +54,7 @@ devkit avs build
 ```
 
 This builds:
-- `./bin/performer` - JavaScript execution engine
+- `./bin/performer` - Multi-runtime execution engine (JavaScript/Python)
 - `./clients/bin/faas-cli` - Command-line interface
 
 ### 2. Deploy Contracts and Start Devnet
@@ -73,7 +73,7 @@ This command:
 
 ### 3. Start the Performer
 
-The performer handles JavaScript execution for operators:
+The performer handles multi-runtime function execution for operators:
 
 ```bash
 devkit avs run
@@ -171,6 +171,24 @@ def handler(input_data):
             "message": f"Echo from Python: {input_data}",
             "language": "python"
         }
+```
+
+#### Required manifest.json
+
+**All functions must include a `manifest.json` file specifying the runtime:**
+
+For JavaScript functions:
+```json
+{
+  "runtime": "javascript"
+}
+```
+
+For Python functions:
+```json
+{
+  "runtime": "python"
+}
 ```
 
 #### Local Deployment
