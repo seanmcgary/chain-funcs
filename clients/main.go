@@ -56,6 +56,12 @@ func main() {
 						EnvVars:  []string{"RPC_URL"},
 					},
 					&cli.StringFlag{
+						Name:     "ws-rpc-url",
+						Usage:    "Ethereum WebSocket RPC URL for event subscriptions",
+						Value:    config.GetDefaultWSRPCURL(),
+						EnvVars:  []string{"WS_RPC_URL"},
+					},
+					&cli.StringFlag{
 						Name:     "private-key",
 						Usage:    "Private key for signing transactions",
 						Required: true,
@@ -76,7 +82,7 @@ func main() {
 					&cli.StringFlag{
 						Name:     "function-id",
 						Usage:    "Function ID (32-byte hex string)",
-						Value:    config.GetFaaSAddress(),
+						Required: true,
 					},
 				},
 				ArgsUsage: "<input-string>",
@@ -88,6 +94,7 @@ func main() {
 				Action: func(c *cli.Context) error {
 					fmt.Printf("Embedded Contract Configuration:\n\n")
 					fmt.Printf("RPC URL: %s\n", config.GetDefaultRPCURL())
+					fmt.Printf("WebSocket RPC URL: %s\n", config.GetDefaultWSRPCURL())
 					fmt.Printf("TaskMailbox Address: %s\n", config.GetTaskMailboxAddress())
 					fmt.Printf("FaaS Address: %s\n", config.GetFaaSAddress())
 					fmt.Printf("\nNote: These addresses are embedded at compile time from devnet deployment.\n")

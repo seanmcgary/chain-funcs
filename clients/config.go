@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 //go:embed contracts/taskMailbox.json
@@ -43,6 +44,23 @@ func LoadEmbeddedConfig() (*EmbeddedConfig, error) {
 func (c *EmbeddedConfig) GetDefaultRPCURL() string {
 	// Default RPC URL from devnet config
 	return "http://localhost:7545"
+}
+
+func (c *EmbeddedConfig) GetDefaultWSRPCURL() string {
+	// Convert HTTP RPC URL to WebSocket URL
+	baseURL := c.GetDefaultRPCURL()
+	return convertHTTPToWebSocket(baseURL)
+}
+
+func convertHTTPToWebSocket(httpURL string) string {
+	// Convert http:// to ws:// and https:// to wss://
+	if strings.HasPrefix(httpURL, "http://") {
+		return strings.Replace(httpURL, "http://", "ws://", 1)
+	} else if strings.HasPrefix(httpURL, "https://") {
+		return strings.Replace(httpURL, "https://", "wss://", 1)
+	}
+	// If no http/https prefix, assume ws:// should be used
+	return "ws://" + httpURL
 }
 
 func (c *EmbeddedConfig) GetTaskMailboxAddress() string {

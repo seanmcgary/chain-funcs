@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-async function runFunction(functionDir, inputArgs) {
+async function runFunction(functionDir, inputData) {
     let payload = null;
     let error = null;
     
@@ -16,13 +16,34 @@ async function runFunction(functionDir, inputArgs) {
         
         delete require.cache[require.resolve(indexPath)];
         
-        const userFunction = require(indexPath);
+        // Capture console output during user function execution
+        const originalConsole = console.log;
+        const capturedLogs = [];
+        console.log = (...args) => {
+            capturedLogs.push(args.map(arg => String(arg)).join(' '));
+        };
         
-        if (!userFunction.handler || typeof userFunction.handler !== 'function') {
-            throw new Error('Function must export a handler function');
+        try {
+            const userFunction = require(indexPath);
+            
+            if (!userFunction.handler || typeof userFunction.handler !== 'function') {
+                throw new Error('Function must export a handler function');
+            }
+            
+            payload = await userFunction.handler(inputData);
+            
+        } finally {
+            // Restore console.log
+            console.log = originalConsole;
         }
         
-        payload = await userFunction.handler(inputArgs);
+        // Include captured logs in the result
+        if (capturedLogs.length > 0) {
+            payload = {
+                result: payload,
+                logs: capturedLogs
+            };
+        }
         
     } catch (err) {
         error = err.message;
@@ -39,23 +60,36 @@ async function runFunction(functionDir, inputArgs) {
 if (process.argv.length < 4) {
     console.log(JSON.stringify({
         payload: null,
-        error: 'Usage: node js-runner.js <functionDir> <inputJSON>'
+        error: 'Usage: node js-runner.js <functionDir> <inputBase64>'
     }));
     process.exit(1);
 }
 
 const functionDir = process.argv[2];
-const inputJSON = process.argv[3];
+const inputBase64 = process.argv[3];
 
-let inputArgs;
+let inputData;
 try {
-    inputArgs = JSON.parse(inputJSON);
+    // Decode base64 to get raw bytes
+    const inputBuffer = Buffer.from(inputBase64, 'base64');
+    
+    // Try to parse as JSON first, but fall back to raw data
+    try {
+        inputData = JSON.parse(inputBuffer.toString('utf8'));
+    } catch (jsonError) {
+        // If it's not JSON, provide the raw buffer and string representation
+        inputData = {
+            raw: inputBuffer,
+            text: inputBuffer.toString('utf8'),
+            base64: inputBase64
+        };
+    }
 } catch (error) {
     console.log(JSON.stringify({
         payload: null,
-        error: 'Invalid JSON input: ' + error.message
+        error: 'Invalid base64 input: ' + error.message
     }));
     process.exit(1);
 }
 
-runFunction(functionDir, inputArgs);
+runFunction(functionDir, inputData);

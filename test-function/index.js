@@ -1,5 +1,5 @@
 
-exports.handler = async function(args = []) {
+exports.handler = async function(args) {
 	console.log('Hello world!');
 	console.log('Arguments:', args);
 

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -189,15 +190,8 @@ func (tw *TaskWorker) executeJavaScriptFunction(call *FunctionCall) (*ExecutionR
 		tw.logger.Sugar().Infof("Extracted files: %v", files)
 	}
 
-	var inputArgs interface{}
-	if err := json.Unmarshal(call.Input, &inputArgs); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal input arguments: %w", err)
-	}
-
-	inputJSON, err := json.Marshal(inputArgs)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal input arguments: %w", err)
-	}
+	// Pass raw input data as base64 to preserve binary data
+	inputBase64 := base64.StdEncoding.EncodeToString(call.Input)
 
 	// Try to find the js-runner.js script
 	scriptPath := "/app/scripts/js-runner.js"
@@ -209,9 +203,9 @@ func (tw *TaskWorker) executeJavaScriptFunction(call *FunctionCall) (*ExecutionR
 		}
 	}
 
-	tw.logger.Sugar().Infof("Executing: node %s %s %s", scriptPath, functionDir, string(inputJSON))
+	tw.logger.Sugar().Infof("Executing: node %s %s <base64-encoded-input>", scriptPath, functionDir)
 	
-	cmd := exec.Command("node", scriptPath, functionDir, string(inputJSON))
+	cmd := exec.Command("node", scriptPath, functionDir, inputBase64)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
