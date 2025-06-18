@@ -105,16 +105,59 @@
           "type": "bytes32"
         }
       ],
-      "name": "functions",
+      "name": "functionContent",
       "outputs": [
         {
           "internalType": "bytes",
-          "name": "content",
+          "name": "",
           "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "functionMetadata",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "hasContent",
+          "type": "bool"
         },
         {
+          "internalType": "bool",
+          "name": "hasUrl",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint32",
+          "name": "contentLength",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "functionUrls",
+      "outputs": [
+        {
           "internalType": "string",
-          "name": "url",
+          "name": "",
           "type": "string"
         }
       ],
@@ -166,6 +209,42 @@
           "internalType": "bytes",
           "name": "",
           "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getFunctionMetadata",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "hasContent",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "hasUrl",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint32",
+              "name": "contentLength",
+              "type": "uint32"
+            }
+          ],
+          "internalType": "struct FaaS.FunctionMetadata",
+          "name": "",
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",
