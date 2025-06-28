@@ -5,11 +5,14 @@ import {Script, console} from "forge-std/Script.sol";
 import {stdJson} from "forge-std/StdJson.sol";
 
 import {IAllocationManager} from "@eigenlayer-contracts/src/contracts/interfaces/IAllocationManager.sol";
-import {ITaskMailbox, ITaskMailboxTypes} from "@hourglass-monorepo/src/interfaces/core/ITaskMailbox.sol";
-import {ITaskAVSRegistrar, ITaskAVSRegistrarTypes} from "@hourglass-monorepo/src/interfaces/avs/l1/ITaskAVSRegistrar.sol";
-import {IAVSTaskHook} from "@hourglass-monorepo/src/interfaces/avs/l2/IAVSTaskHook.sol";
-import {IBN254CertificateVerifier} from "@hourglass-monorepo/src/interfaces/avs/l2/IBN254CertificateVerifier.sol";
-import {FaaS} from "@project/FaaS.sol";
+import {IKeyRegistrar} from "@eigenlayer-contracts/src/contracts/interfaces/IKeyRegistrar.sol";
+import {IBN254CertificateVerifier} from
+    "@eigenlayer-contracts/src/contracts/interfaces/IBN254CertificateVerifier.sol";
+import {ITaskMailbox} from "@hourglass-monorepo/src/interfaces/core/ITaskMailbox.sol";
+
+import {TaskAVSRegistrar} from "@project/l1-contracts/TaskAVSRegistrar.sol";
+import {AVSTaskHook} from "@project/l2-contracts/AVSTaskHook.sol";
+import {HelloWorld} from "@project/HelloWorld.sol"; // Import your custom contract
 
 contract DeployMyContracts is Script {
     using stdJson for string;
@@ -18,10 +21,12 @@ contract DeployMyContracts is Script {
         address avs;
         uint256 avsPrivateKey;
         uint256 deployerPrivateKey;
-        ITaskMailbox taskMailbox;
-        ITaskAVSRegistrar taskAVSRegistrar;
-        IAVSTaskHook taskHook;
+        IAllocationManager allocationManager;
+        IKeyRegistrar keyRegistrar;
         IBN254CertificateVerifier certificateVerifier;
+        ITaskMailbox taskMailbox;
+        TaskAVSRegistrar taskAVSRegistrar;
+        AVSTaskHook taskHook;
     }
 
     struct Output {
@@ -29,22 +34,18 @@ contract DeployMyContracts is Script {
         address contractAddress;
     }
 
-    function run(string memory environment, string memory _context, address /* allocationManager */) public {
+    function run(string memory environment, string memory _context) public {
         // Read the context
         Context memory context = _readContext(environment, _context);
 
         vm.startBroadcast(context.deployerPrivateKey);
         console.log("Deployer address:", vm.addr(context.deployerPrivateKey));
-        
-        // For FaaS, we need to get the first executor operator set ID from the AVS config
-        ITaskMailbox.AvsConfig memory avsConfig = context.taskMailbox.getAvsConfig(context.avs);
-        require(avsConfig.executorOperatorSetIds.length > 0, "No executor operator set configured");
-        uint32 executorOperatorSetId = avsConfig.executorOperatorSetIds[0];
-        
-        FaaS faas = new FaaS(address(context.taskMailbox), context.avs, executorOperatorSetId);
-        console.log("FaaS deployed to:", address(faas));
-        console.log("Using AVS:", context.avs);
-        console.log("Using executor operator set ID:", executorOperatorSetId);
+
+        //TODO: Implement custom contracts deployment
+        // CustomContract customContract = new CustomContract();
+        // console.log("CustomContract deployed to:", address(customContract));
+        HelloWorld helloWorld = new HelloWorld();
+        console.log("HelloWorld deployed to:", address(helloWorld));
 
         vm.stopBroadcast();
 
@@ -55,8 +56,11 @@ contract DeployMyContracts is Script {
 
         vm.stopBroadcast();
 
+        //TODO: Write to output file
         Output[] memory outputs = new Output[](1);
-        outputs[0] = Output({name: "FaaS", contractAddress: address(faas)});
+        // outputs[0] = Output({name: "CustomContract", address: address(customContract)});
+        // _writeOutputToJson(environment, outputs);
+        outputs[0] = Output({name: "HelloWorld", contractAddress: address(helloWorld)});
         _writeOutputToJson(environment, outputs);
     }
 
@@ -69,10 +73,12 @@ contract DeployMyContracts is Script {
         context.avs = stdJson.readAddress(_context, ".context.avs.address");
         context.avsPrivateKey = uint256(stdJson.readBytes32(_context, ".context.avs.avs_private_key"));
         context.deployerPrivateKey = uint256(stdJson.readBytes32(_context, ".context.deployer_private_key"));
+        context.allocationManager = IAllocationManager(stdJson.readAddress(_context, ".context.eigenlayer.l1.allocation_manager"));
+        context.keyRegistrar = IKeyRegistrar(stdJson.readAddress(_context, ".context.eigenlayer.l1.key_registrar"));
+        context.certificateVerifier = IBN254CertificateVerifier(stdJson.readAddress(_context, ".context.eigenlayer.l2.bn254_certificate_verifier"));
         context.taskMailbox = ITaskMailbox(_readHourglassConfigAddress(environment, "taskMailbox"));
-        context.taskAVSRegistrar = ITaskAVSRegistrar(_readAVSL1ConfigAddress(environment, "taskAVSRegistrar"));
-        context.taskHook = IAVSTaskHook(_readAVSL2ConfigAddress(environment, "avsTaskHook"));
-        context.certificateVerifier = IBN254CertificateVerifier(_readAVSL2ConfigAddress(environment, "bn254CertificateVerifier"));
+        context.taskAVSRegistrar = TaskAVSRegistrar(_readAVSL1ConfigAddress(environment, "taskAVSRegistrar"));
+        context.taskHook = AVSTaskHook(_readAVSL2ConfigAddress(environment, "avsTaskHook"));
 
         return context;
     }

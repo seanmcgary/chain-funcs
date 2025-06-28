@@ -1,6 +1,8 @@
-version: 0.0.1
 config:
-  project:
-    name: "my-avs"
-    version: "0.1.0"
-    context: "devnet"
+    project:
+        context: devnet
+        name: my-avs
+        templateBaseUrl: https://github.com/Layr-Labs/hourglass-avs-template
+        templateVersion: v0.0.13
+        version: 0.1.0
+version: 0.0.1
