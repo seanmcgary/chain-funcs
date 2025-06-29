@@ -1,5 +1,5 @@
 # Devnet context to be used for local deployments against Anvil chain
-version: 0.0.5
+version: 0.0.6
 context:
   # Name of the context
   name: "devnet"
@@ -9,49 +9,86 @@ context:
       chain_id: 31337
       rpc_url: "http://localhost:7545"
       fork:
-        block: 22475020
-        url: "https://tame-fabled-liquid.quiknode.pro/f27d4be93b4d7de3679f5c5ae881233f857407a0/"
+        block: 4017700
+        url: "https://special-yolo-river.ethereum-holesky.quiknode.pro/2d21099a19e7c896a22b9fcc23dc8ce80f2214a5/"
         block_time: 3
     l2:
       chain_id: 31337
       rpc_url: "http://localhost:7545"
       fork:
-        block: 22475020
-        url: "https://tame-fabled-liquid.quiknode.pro/f27d4be93b4d7de3679f5c5ae881233f857407a0/"
+        block: 4017700
+        url: "https://special-yolo-river.ethereum-holesky.quiknode.pro/2d21099a19e7c896a22b9fcc23dc8ce80f2214a5/"
         block_time: 3
+  # Stake Root Transporter configuration
+  transporter:
+    schedule: 0 */2 * * *
+    private_key: 0x2ba58f64c57faa1073d63add89799f2a0101855a8b289b1330cb500758d5d1ee
+    bls_private_key: 0x2ba58f64c57faa1073d63add89799f2a0101855a8b289b1330cb500758d5d1ee
+    active_stake_roots:
+      - chain_id: 31337
+        stake_root: 0xf553378f6347e89f3ea812e2908dc655074189e85894294f1848d64a549ac101
   # All key material (BLS and ECDSA) within this file should be used for local testing ONLY
   # ECDSA keys used are from Anvil's private key set
   # BLS keystores are deterministically pre-generated and embedded. These are NOT derived from a secure seed
   # Available private keys for deploying
   deployer_private_key: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80" # Anvil Private Key 0
   app_private_key: "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a" # Anvil Private Key 2
+  # List of stakers and their delegations
+  stakers:
+    - address: "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f"
+      ecdsa_key: "0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97" # Anvil 8
+      deposits:
+        - strategy_address: "0x7D704507b76571a51d9caE8AdDAbBFd0ba0e63d3"
+          name: "stETH_Strategy"
+          deposit_amount: "5ETH" # depositIntoStrategy amount 
+      operator: "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" # Operator to delegate the stake via delegationManager.delegateTo()
+    - address: "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720"
+      ecdsa_key: "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6"
+      deposits:
+        - strategy_address: "0x7D704507b76571a51d9caE8AdDAbBFd0ba0e63d3"
+          name: "stETH_Strategy"
+          deposit_amount: "5ETH" # depositIntoStrategy amount 
+      operator: "0x90F79bf6EB2c4f870365E785982E1f101E93b906"
   # List of Operators and their private keys / stake details
   operators:
     - address: "0x90F79bf6EB2c4f870365E785982E1f101E93b906"
       ecdsa_key: "0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6" # Anvil Private Key 3
       bls_keystore_path: "keystores/operator1.keystore.json"
       bls_keystore_password: "testpass"
-      stake: "1000ETH"
+      allocations:
+        - strategy_address: "0x7D704507b76571a51d9caE8AdDAbBFd0ba0e63d3"
+          name: "stETH_Strategy"
+          # Only allocate if these operator set IDs exist in the deployed operator_sets 
+          operator_set_allocations:
+            - operator_set: "0"
+              allocation_in_wads: "500000000000000000" # 5e17 i.e 50% of max allocation
+            - operator_set: "1"
+              allocation_in_wads: "500000000000000000" # 5e17 i.e 50% of max allocation
     - address: "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65"
       ecdsa_key: "0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a" # Anvil Private Key 4
       bls_keystore_path: "keystores/operator2.keystore.json"
       bls_keystore_password: "testpass"
-      stake: "1000ETH"
+      allocations:
+        - strategy_address: "0x7D704507b76571a51d9caE8AdDAbBFd0ba0e63d3"
+          name: "stETH_Strategy"
+          # Only allocate if these operator set IDs exist in the deployed operator_sets 
+          operator_set_allocations:
+            - operator_set: "0"
+              allocation_in_wads: "500000000000000000" # 5e17 i.e 50% of max allocation
+            - operator_set: "1"
+              allocation_in_wads: "500000000000000000" # 5e17 i.e 50% of max allocation
     - address: "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc"
       ecdsa_key: "0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba" # Anvil Private Key 5
       bls_keystore_path: "keystores/operator3.keystore.json"
       bls_keystore_password: "testpass"
-      stake: "1000ETH"
     - address: "0x976EA74026E726554dB657fA54763abd0C3a0aa9"
       ecdsa_key: "0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e" # Anvil Private Key 6
       bls_keystore_path: "keystores/operator4.keystore.json"
       bls_keystore_password: "testpass"
-      stake: "1000ETH"
     - address: "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955"
       ecdsa_key: "0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356" # Anvil Private Key 7
       bls_keystore_path: "keystores/operator5.keystore.json"
       bls_keystore_password: "testpass"
-      stake: "1000ETH"
   # AVS configuration
   avs:
     address: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
@@ -60,40 +97,49 @@ context:
     registrar_address: "0x0123456789abcdef0123456789ABCDEF01234567"
   # Core EigenLayer contract addresses
   eigenlayer:
-    allocation_manager: "0x948a420b8CC1d6BFd0B6087C2E7c344a2CD0bc39"
-    delegation_manager: "0x39053D51B77DC0d36036Fc1fCc8Cb819df8Ef37A"
+    l1:
+      allocation_manager: "0xFdD5749e11977D60850E06bF5B13221Ad95eb6B4"
+      delegation_manager: "0x75dfE5B44C2E530568001400D3f704bC8AE350CC"
+      strategy_manager: "0xdfB5f6CE42aAA7830E94ECFCcAd411beF4d4D5b6"
+      bn254_table_calculator: "0x033af59c1b030Cc6eEE07B150FD97668497dc74b"
+      cross_chain_registry: "0x0022d2014901F2AFBF5610dDFcd26afe2a65Ca6F"
+      key_registrar: "0x1C84Bb62fE7791e173014A879C706445fa893BbE"
+      release_manager: "0x323A9FcB2De80d04B5C4B0F72ee7799100D32F0F"
+    l2:
+      bn254_certificate_verifier: "0xf462d03A82C1F3496B0DFe27E978318eD1720E1f"
+      operator_table_updater: "0xd7230B89E5E2ed1FD068F0FF9198D7960243f12a"
   # Contracts deployed on `devnet start`
   deployed_contracts:
     - abi: .devkit/contracts/out/TaskMailbox.sol/TaskMailbox.json
-      address: 0x4B7099FD879435a087C364aD2f9E7B3f94d20bBe
+      address: 0x0c8A72d89AA40B71Ee5F430E89E1681f944DAAc0
       name: taskMailbox
     - abi: .devkit/contracts/out/TaskAVSRegistrar.sol/TaskAVSRegistrar.json
-      address: 0x99aA73dA6309b8eC484eF2C95e96C131C1BBF7a0
+      address: 0xC2100780F828810bAaeCD3039111006E12B26CF8
       name: taskAVSRegistrar
     - abi: .devkit/contracts/out/AVSTaskHook.sol/AVSTaskHook.json
-      address: 0x98721EFD3D09A7Ae662C4D63156286DF673FC50B
+      address: 0x6b165dE91F825584117c23f79F634849aCff4f68
       name: avsTaskHook
-    - abi: .devkit/contracts/out/BN254CertificateVerifier.sol/BN254CertificateVerifier.json
-      address: 0xFBc00Fa47a7d3bbE3e82B5Aa560B47008c1bD64c
-      name: bn254CertificateVerifier
     - abi: .devkit/contracts/out/FaaS.sol/FaaS.json
-      address: 0x240A60DC5e0B9013Cb8CF39aa6f9dDd8f25E40D2
+      address: 0x69B9aE74db4e9dF49cBb925eb96f86B4904ab275
       name: FaaS
   # Operator Sets registered on `devnet start`
   operator_sets:
     - operator_set_id: 0
       strategies:
-        - strategy: 0xaCB55C530Acdb2849e6d4f36992Cd8c9D50ED8F7
-        - strategy: 0x93c4b944D05dfe6df7645A86cd2206016c51564D
+        - strategy: 0x5C8b55722f421556a2AAfb7A3EA63d4c3e514312
     - operator_set_id: 1
       strategies:
-        - strategy: 0xaCB55C530Acdb2849e6d4f36992Cd8c9D50ED8F7
-        - strategy: 0x93c4b944D05dfe6df7645A86cd2206016c51564D
+        - strategy: 0x5C8b55722f421556a2AAfb7A3EA63d4c3e514312
   # Operators registered on `devnet start`
   operator_registrations:
     - address: 0x90F79bf6EB2c4f870365E785982E1f101E93b906
       operator_set_id: 0
-      payload: 000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000001201f231065396b023280ef8d1d9437fed8bddf8234a84ed4d02f461cfc1d447eff2a8cf76350c3a9075ed9e4d17c2286302b9060728552dae2e69678d695f20d641b814272278ad65a10d8b38f714991f8f1286ac4f54e11cb0c3e71045684ffaf2e1105ba372e871fcb16b5a463f03841b33b8160a5cfd5a41517b8b1952623ff15de6881d859600f953e1b00fa58a950c65eac7c86860412b269c2a33bac09e51d37f7f962df4041a82808c85140c6186878b4695673ecd3c6fd1b7953d9f77000161e1c998df8e36d9cd89717ec47a5e385220ea4c9fa4bf419a3563fb5c3541425a016e78736ea3568613ff6338ffcec5a40e597b31ed959bb630d22502a70000000000000000000000000000000000000000000000000000000000000000f61676772656761746f723a393030300000000000000000000000000000000000
+      payload: 0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000f61676772656761746f723a393030300000000000000000000000000000000000
     - address: 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
       operator_set_id: 1
-      payload: 0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000012025b959a916afa394d4b928538daeda26b8bcc25d10583d4d3745b376b68c2a2d00d9997cb9ee77c1a71c66215d5443fdf473d6bd2da55fc4b2648e472168f5261d029f3c896b4c62359919ab0bce753d489fcbed4f980963a0906e2e181e545c2478dc7b1b068111c6db2db11798a751e3f357be666c68658a25a563fd9a82040ade1cdf142c7dbf27aa9173a6dc34515607a444bd8c178180689a0f80cf38352a547c0d1a5763c18b4af4107c51a1633fb70fc975fe7a8e98b5e224d9dba90c0832c8878dac72b88643c1c9313d0d20eac8b8bbb1347aa9a3d83ee61b7b2a4c237dcae2f9ba22b3a4b6b09e426fa805eb5338c1f4af3ac199ae1259a3a6ae1d000000000000000000000000000000000000000000000000000000000000000d6578656375746f723a3930393000000000000000000000000000000000000000
+      payload: 0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000d6578656375746f723a3930393000000000000000000000000000000000000000
+  artifacts:
+    artifactId: sha256:e1404e7aa8c4926d939d49ac936cf555de8399f63db136639b961864fae205dd
+    component: performer
+    digest: ""
+    registry_url: ""

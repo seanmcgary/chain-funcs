@@ -1,6 +1,6 @@
 {
   "name": "avsTaskHook",
-  "address": "0x98721EFD3D09A7Ae662C4D63156286DF673FC50B",
+  "address": "0x6b165dE91F825584117c23f79F634849aCff4f68",
   "abi": [
     {
       "inputs": [
@@ -83,7 +83,7 @@
                 }
               ],
               "internalType": "struct BN254.G1Point",
-              "name": "sig",
+              "name": "signature",
               "type": "tuple"
             },
             {
@@ -104,11 +104,6 @@
               "type": "tuple"
             },
             {
-              "internalType": "uint32[]",
-              "name": "nonsignerIndices",
-              "type": "uint32[]"
-            },
-            {
               "components": [
                 {
                   "internalType": "uint32",
@@ -117,7 +112,7 @@
                 },
                 {
                   "internalType": "bytes",
-                  "name": "operatorInfoProofs",
+                  "name": "operatorInfoProof",
                   "type": "bytes"
                 },
                 {
@@ -140,22 +135,22 @@
                       "type": "tuple"
                     },
                     {
-                      "internalType": "uint96[]",
+                      "internalType": "uint256[]",
                       "name": "weights",
-                      "type": "uint96[]"
+                      "type": "uint256[]"
                     }
                   ],
-                  "internalType": "struct IBN254CertificateVerifier.BN254OperatorInfo",
+                  "internalType": "struct IBN254TableCalculatorTypes.BN254OperatorInfo",
                   "name": "operatorInfo",
                   "type": "tuple"
                 }
               ],
-              "internalType": "struct IBN254CertificateVerifier.BN254OperatorInfoWitness[]",
+              "internalType": "struct IBN254CertificateVerifierTypes.BN254OperatorInfoWitness[]",
               "name": "nonSignerWitnesses",
               "type": "tuple[]"
             }
           ],
-          "internalType": "struct IBN254CertificateVerifier.BN254Certificate",
+          "internalType": "struct IBN254CertificateVerifierTypes.BN254Certificate",
           "name": "",
           "type": "tuple"
         }

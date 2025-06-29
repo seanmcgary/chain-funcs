@@ -1,301 +1,380 @@
 {
   "name": "FaaS",
-  "address": "0x240A60DC5e0B9013Cb8CF39aa6f9dDd8f25E40D2",
+  "address": "0x69B9aE74db4e9dF49cBb925eb96f86B4904ab275",
   "abi": [
     {
-      "type": "constructor",
       "inputs": [
         {
+          "internalType": "address",
           "name": "_taskMailbox",
-          "type": "address",
-          "internalType": "address"
+          "type": "address"
         },
         {
+          "internalType": "address",
           "name": "_avs",
-          "type": "address",
-          "internalType": "address"
+          "type": "address"
         },
         {
+          "internalType": "uint32",
           "name": "_executorOperatorSetId",
-          "type": "uint32",
-          "internalType": "uint32"
+          "type": "uint32"
         }
       ],
-      "stateMutability": "nonpayable"
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
-      "type": "function",
+      "inputs": [],
       "name": "avs",
-      "inputs": [],
       "outputs": [
         {
+          "internalType": "address",
           "name": "",
-          "type": "address",
-          "internalType": "address"
+          "type": "address"
         }
       ],
-      "stateMutability": "view"
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "callFunction",
       "inputs": [
         {
+          "internalType": "bytes32",
           "name": "functionId",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "type": "bytes32"
         },
         {
+          "internalType": "bytes",
           "name": "arguments",
-          "type": "bytes",
-          "internalType": "bytes"
+          "type": "bytes"
         }
       ],
+      "name": "callFunction",
       "outputs": [
         {
+          "internalType": "bytes32",
           "name": "",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "type": "bytes32"
         }
       ],
-      "stateMutability": "nonpayable"
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "deployFunction",
       "inputs": [
         {
+          "internalType": "string",
           "name": "url",
-          "type": "string",
-          "internalType": "string"
+          "type": "string"
         },
         {
+          "internalType": "bytes32",
           "name": "digest",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "type": "bytes32"
         }
       ],
+      "name": "deployFunction",
       "outputs": [
         {
+          "internalType": "bytes32",
           "name": "",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "type": "bytes32"
         }
       ],
-      "stateMutability": "nonpayable"
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "executorOperatorSetId",
       "inputs": [],
+      "name": "executorOperatorSetId",
       "outputs": [
         {
+          "internalType": "uint32",
           "name": "",
-          "type": "uint32",
-          "internalType": "uint32"
+          "type": "uint32"
         }
       ],
-      "stateMutability": "view"
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "functions",
       "inputs": [
         {
+          "internalType": "bytes32",
           "name": "",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "type": "bytes32"
         }
       ],
+      "name": "functionContent",
       "outputs": [
         {
-          "name": "content",
-          "type": "bytes",
-          "internalType": "bytes"
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "functionMetadata",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "hasContent",
+          "type": "bool"
         },
         {
-          "name": "url",
-          "type": "string",
-          "internalType": "string"
+          "internalType": "bool",
+          "name": "hasUrl",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint32",
+          "name": "contentLength",
+          "type": "uint32"
         }
       ],
-      "stateMutability": "view"
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "getFunction",
       "inputs": [
         {
-          "name": "functionId",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
         }
       ],
+      "name": "functionUrls",
       "outputs": [
         {
+          "internalType": "string",
           "name": "",
-          "type": "tuple",
-          "internalType": "struct FaaS.Function",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getFunction",
+      "outputs": [
+        {
           "components": [
             {
+              "internalType": "bytes",
               "name": "content",
-              "type": "bytes",
-              "internalType": "bytes"
+              "type": "bytes"
             },
             {
+              "internalType": "string",
               "name": "url",
-              "type": "string",
-              "internalType": "string"
+              "type": "string"
             }
-          ]
+          ],
+          "internalType": "struct FaaS.Function",
+          "name": "",
+          "type": "tuple"
         }
       ],
-      "stateMutability": "view"
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
+        }
+      ],
       "name": "getFunctionContent",
-      "inputs": [
-        {
-          "name": "functionId",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
       "outputs": [
         {
+          "internalType": "bytes",
           "name": "",
-          "type": "bytes",
-          "internalType": "bytes"
+          "type": "bytes"
         }
       ],
-      "stateMutability": "view"
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getFunctionMetadata",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "hasContent",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "hasUrl",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint32",
+              "name": "contentLength",
+              "type": "uint32"
+            }
+          ],
+          "internalType": "struct FaaS.FunctionMetadata",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
+        }
+      ],
       "name": "getFunctionUrl",
-      "inputs": [
-        {
-          "name": "functionId",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
       "outputs": [
         {
+          "internalType": "string",
           "name": "",
-          "type": "string",
-          "internalType": "string"
+          "type": "string"
         }
       ],
-      "stateMutability": "view"
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "registerFunction",
       "inputs": [
         {
+          "internalType": "bytes",
           "name": "content",
-          "type": "bytes",
-          "internalType": "bytes"
+          "type": "bytes"
         }
       ],
+      "name": "registerFunction",
       "outputs": [
         {
+          "internalType": "bytes32",
           "name": "",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "type": "bytes32"
         }
       ],
-      "stateMutability": "nonpayable"
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "taskMailbox",
       "inputs": [],
+      "name": "taskMailbox",
       "outputs": [
         {
+          "internalType": "contract ITaskMailbox",
           "name": "",
-          "type": "address",
-          "internalType": "contract ITaskMailbox"
+          "type": "address"
         }
       ],
-      "stateMutability": "view"
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "event",
-      "name": "FunctionCalled",
+      "anonymous": false,
       "inputs": [
         {
-          "name": "functionId",
-          "type": "bytes32",
           "indexed": true,
-          "internalType": "bytes32"
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
         },
         {
+          "indexed": true,
+          "internalType": "bytes32",
           "name": "taskId",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "bytes32"
+          "type": "bytes32"
         },
         {
+          "indexed": true,
+          "internalType": "address",
           "name": "caller",
-          "type": "address",
-          "indexed": true,
-          "internalType": "address"
+          "type": "address"
         }
       ],
-      "anonymous": false
+      "name": "FunctionCalled",
+      "type": "event"
     },
     {
-      "type": "event",
-      "name": "FunctionDeployed",
+      "anonymous": false,
       "inputs": [
         {
-          "name": "functionId",
-          "type": "bytes32",
           "indexed": true,
-          "internalType": "bytes32"
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
         },
         {
+          "indexed": true,
+          "internalType": "string",
           "name": "url",
-          "type": "string",
-          "indexed": true,
-          "internalType": "string"
+          "type": "string"
         },
         {
+          "indexed": true,
+          "internalType": "bytes32",
           "name": "digest",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "bytes32"
+          "type": "bytes32"
         },
         {
-          "name": "registrar",
-          "type": "address",
           "indexed": false,
-          "internalType": "address"
+          "internalType": "address",
+          "name": "registrar",
+          "type": "address"
         }
       ],
-      "anonymous": false
+      "name": "FunctionDeployed",
+      "type": "event"
     },
     {
-      "type": "event",
-      "name": "FunctionRegistered",
+      "anonymous": false,
       "inputs": [
         {
-          "name": "functionId",
-          "type": "bytes32",
           "indexed": true,
-          "internalType": "bytes32"
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
         },
         {
-          "name": "registrar",
-          "type": "address",
           "indexed": true,
-          "internalType": "address"
+          "internalType": "address",
+          "name": "registrar",
+          "type": "address"
         }
       ],
-      "anonymous": false
+      "name": "FunctionRegistered",
+      "type": "event"
     }
   ]
 }

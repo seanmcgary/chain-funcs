@@ -35,9 +35,16 @@ type FaaSFunction struct {
 	Url     string
 }
 
+// FaaSFunctionMetadata is an auto generated low-level Go binding around an user-defined struct.
+type FaaSFunctionMetadata struct {
+	HasContent    bool
+	HasUrl        bool
+	ContentLength uint32
+}
+
 // FaaSMetaData contains all meta data concerning the FaaS contract.
 var FaaSMetaData = &bind.MetaData{
-	ABI: "[{\"type\":\"constructor\",\"inputs\":[{\"name\":\"_taskMailbox\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"_avs\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"_executorOperatorSetId\",\"type\":\"uint32\",\"internalType\":\"uint32\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"avs\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"callFunction\",\"inputs\":[{\"name\":\"functionId\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"},{\"name\":\"arguments\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"deployFunction\",\"inputs\":[{\"name\":\"url\",\"type\":\"string\",\"internalType\":\"string\"},{\"name\":\"digest\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"executorOperatorSetId\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint32\",\"internalType\":\"uint32\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"functions\",\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"outputs\":[{\"name\":\"content\",\"type\":\"bytes\",\"internalType\":\"bytes\"},{\"name\":\"url\",\"type\":\"string\",\"internalType\":\"string\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getFunction\",\"inputs\":[{\"name\":\"functionId\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"outputs\":[{\"name\":\"\",\"type\":\"tuple\",\"internalType\":\"structFaaS.Function\",\"components\":[{\"name\":\"content\",\"type\":\"bytes\",\"internalType\":\"bytes\"},{\"name\":\"url\",\"type\":\"string\",\"internalType\":\"string\"}]}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getFunctionContent\",\"inputs\":[{\"name\":\"functionId\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getFunctionUrl\",\"inputs\":[{\"name\":\"functionId\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"outputs\":[{\"name\":\"\",\"type\":\"string\",\"internalType\":\"string\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"registerFunction\",\"inputs\":[{\"name\":\"content\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"taskMailbox\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"contractITaskMailbox\"}],\"stateMutability\":\"view\"},{\"type\":\"event\",\"name\":\"FunctionCalled\",\"inputs\":[{\"name\":\"functionId\",\"type\":\"bytes32\",\"indexed\":true,\"internalType\":\"bytes32\"},{\"name\":\"taskId\",\"type\":\"bytes32\",\"indexed\":true,\"internalType\":\"bytes32\"},{\"name\":\"caller\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"FunctionDeployed\",\"inputs\":[{\"name\":\"functionId\",\"type\":\"bytes32\",\"indexed\":true,\"internalType\":\"bytes32\"},{\"name\":\"url\",\"type\":\"string\",\"indexed\":true,\"internalType\":\"string\"},{\"name\":\"digest\",\"type\":\"bytes32\",\"indexed\":true,\"internalType\":\"bytes32\"},{\"name\":\"registrar\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"FunctionRegistered\",\"inputs\":[{\"name\":\"functionId\",\"type\":\"bytes32\",\"indexed\":true,\"internalType\":\"bytes32\"},{\"name\":\"registrar\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"}],\"anonymous\":false}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_taskMailbox\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_avs\",\"type\":\"address\"},{\"internalType\":\"uint32\",\"name\":\"_executorOperatorSetId\",\"type\":\"uint32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"avs\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"functionId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"arguments\",\"type\":\"bytes\"}],\"name\":\"callFunction\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"digest\",\"type\":\"bytes32\"}],\"name\":\"deployFunction\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"executorOperatorSetId\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"functionContent\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"functionMetadata\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"hasContent\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"hasUrl\",\"type\":\"bool\"},{\"internalType\":\"uint32\",\"name\":\"contentLength\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"functionUrls\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"functionId\",\"type\":\"bytes32\"}],\"name\":\"getFunction\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes\",\"name\":\"content\",\"type\":\"bytes\"},{\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"}],\"internalType\":\"structFaaS.Function\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"functionId\",\"type\":\"bytes32\"}],\"name\":\"getFunctionContent\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"functionId\",\"type\":\"bytes32\"}],\"name\":\"getFunctionMetadata\",\"outputs\":[{\"components\":[{\"internalType\":\"bool\",\"name\":\"hasContent\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"hasUrl\",\"type\":\"bool\"},{\"internalType\":\"uint32\",\"name\":\"contentLength\",\"type\":\"uint32\"}],\"internalType\":\"structFaaS.FunctionMetadata\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"functionId\",\"type\":\"bytes32\"}],\"name\":\"getFunctionUrl\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"content\",\"type\":\"bytes\"}],\"name\":\"registerFunction\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"taskMailbox\",\"outputs\":[{\"internalType\":\"contractITaskMailbox\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"functionId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"taskId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"caller\",\"type\":\"address\"}],\"name\":\"FunctionCalled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"functionId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"digest\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"registrar\",\"type\":\"address\"}],\"name\":\"FunctionDeployed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"functionId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"registrar\",\"type\":\"address\"}],\"name\":\"FunctionRegistered\",\"type\":\"event\"}]",
 }
 
 // FaaSABI is the input ABI used to generate the binding from.
@@ -248,49 +255,116 @@ func (_FaaS *FaaSCallerSession) ExecutorOperatorSetId() (uint32, error) {
 	return _FaaS.Contract.ExecutorOperatorSetId(&_FaaS.CallOpts)
 }
 
-// Functions is a free data retrieval call binding the contract method 0xb4e02f94.
+// FunctionContent is a free data retrieval call binding the contract method 0xfaddefeb.
 //
-// Solidity: function functions(bytes32 ) view returns(bytes content, string url)
-func (_FaaS *FaaSCaller) Functions(opts *bind.CallOpts, arg0 [32]byte) (struct {
-	Content []byte
-	Url     string
+// Solidity: function functionContent(bytes32 ) view returns(bytes)
+func (_FaaS *FaaSCaller) FunctionContent(opts *bind.CallOpts, arg0 [32]byte) ([]byte, error) {
+	var out []interface{}
+	err := _FaaS.contract.Call(opts, &out, "functionContent", arg0)
+
+	if err != nil {
+		return *new([]byte), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([]byte)).(*[]byte)
+
+	return out0, err
+
+}
+
+// FunctionContent is a free data retrieval call binding the contract method 0xfaddefeb.
+//
+// Solidity: function functionContent(bytes32 ) view returns(bytes)
+func (_FaaS *FaaSSession) FunctionContent(arg0 [32]byte) ([]byte, error) {
+	return _FaaS.Contract.FunctionContent(&_FaaS.CallOpts, arg0)
+}
+
+// FunctionContent is a free data retrieval call binding the contract method 0xfaddefeb.
+//
+// Solidity: function functionContent(bytes32 ) view returns(bytes)
+func (_FaaS *FaaSCallerSession) FunctionContent(arg0 [32]byte) ([]byte, error) {
+	return _FaaS.Contract.FunctionContent(&_FaaS.CallOpts, arg0)
+}
+
+// FunctionMetadata is a free data retrieval call binding the contract method 0x064a3a62.
+//
+// Solidity: function functionMetadata(bytes32 ) view returns(bool hasContent, bool hasUrl, uint32 contentLength)
+func (_FaaS *FaaSCaller) FunctionMetadata(opts *bind.CallOpts, arg0 [32]byte) (struct {
+	HasContent    bool
+	HasUrl        bool
+	ContentLength uint32
 }, error) {
 	var out []interface{}
-	err := _FaaS.contract.Call(opts, &out, "functions", arg0)
+	err := _FaaS.contract.Call(opts, &out, "functionMetadata", arg0)
 
 	outstruct := new(struct {
-		Content []byte
-		Url     string
+		HasContent    bool
+		HasUrl        bool
+		ContentLength uint32
 	})
 	if err != nil {
 		return *outstruct, err
 	}
 
-	outstruct.Content = *abi.ConvertType(out[0], new([]byte)).(*[]byte)
-	outstruct.Url = *abi.ConvertType(out[1], new(string)).(*string)
+	outstruct.HasContent = *abi.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.HasUrl = *abi.ConvertType(out[1], new(bool)).(*bool)
+	outstruct.ContentLength = *abi.ConvertType(out[2], new(uint32)).(*uint32)
 
 	return *outstruct, err
 
 }
 
-// Functions is a free data retrieval call binding the contract method 0xb4e02f94.
+// FunctionMetadata is a free data retrieval call binding the contract method 0x064a3a62.
 //
-// Solidity: function functions(bytes32 ) view returns(bytes content, string url)
-func (_FaaS *FaaSSession) Functions(arg0 [32]byte) (struct {
-	Content []byte
-	Url     string
+// Solidity: function functionMetadata(bytes32 ) view returns(bool hasContent, bool hasUrl, uint32 contentLength)
+func (_FaaS *FaaSSession) FunctionMetadata(arg0 [32]byte) (struct {
+	HasContent    bool
+	HasUrl        bool
+	ContentLength uint32
 }, error) {
-	return _FaaS.Contract.Functions(&_FaaS.CallOpts, arg0)
+	return _FaaS.Contract.FunctionMetadata(&_FaaS.CallOpts, arg0)
 }
 
-// Functions is a free data retrieval call binding the contract method 0xb4e02f94.
+// FunctionMetadata is a free data retrieval call binding the contract method 0x064a3a62.
 //
-// Solidity: function functions(bytes32 ) view returns(bytes content, string url)
-func (_FaaS *FaaSCallerSession) Functions(arg0 [32]byte) (struct {
-	Content []byte
-	Url     string
+// Solidity: function functionMetadata(bytes32 ) view returns(bool hasContent, bool hasUrl, uint32 contentLength)
+func (_FaaS *FaaSCallerSession) FunctionMetadata(arg0 [32]byte) (struct {
+	HasContent    bool
+	HasUrl        bool
+	ContentLength uint32
 }, error) {
-	return _FaaS.Contract.Functions(&_FaaS.CallOpts, arg0)
+	return _FaaS.Contract.FunctionMetadata(&_FaaS.CallOpts, arg0)
+}
+
+// FunctionUrls is a free data retrieval call binding the contract method 0xf8910880.
+//
+// Solidity: function functionUrls(bytes32 ) view returns(string)
+func (_FaaS *FaaSCaller) FunctionUrls(opts *bind.CallOpts, arg0 [32]byte) (string, error) {
+	var out []interface{}
+	err := _FaaS.contract.Call(opts, &out, "functionUrls", arg0)
+
+	if err != nil {
+		return *new(string), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(string)).(*string)
+
+	return out0, err
+
+}
+
+// FunctionUrls is a free data retrieval call binding the contract method 0xf8910880.
+//
+// Solidity: function functionUrls(bytes32 ) view returns(string)
+func (_FaaS *FaaSSession) FunctionUrls(arg0 [32]byte) (string, error) {
+	return _FaaS.Contract.FunctionUrls(&_FaaS.CallOpts, arg0)
+}
+
+// FunctionUrls is a free data retrieval call binding the contract method 0xf8910880.
+//
+// Solidity: function functionUrls(bytes32 ) view returns(string)
+func (_FaaS *FaaSCallerSession) FunctionUrls(arg0 [32]byte) (string, error) {
+	return _FaaS.Contract.FunctionUrls(&_FaaS.CallOpts, arg0)
 }
 
 // GetFunction is a free data retrieval call binding the contract method 0xe67950d3.
@@ -353,6 +427,37 @@ func (_FaaS *FaaSSession) GetFunctionContent(functionId [32]byte) ([]byte, error
 // Solidity: function getFunctionContent(bytes32 functionId) view returns(bytes)
 func (_FaaS *FaaSCallerSession) GetFunctionContent(functionId [32]byte) ([]byte, error) {
 	return _FaaS.Contract.GetFunctionContent(&_FaaS.CallOpts, functionId)
+}
+
+// GetFunctionMetadata is a free data retrieval call binding the contract method 0x228764b2.
+//
+// Solidity: function getFunctionMetadata(bytes32 functionId) view returns((bool,bool,uint32))
+func (_FaaS *FaaSCaller) GetFunctionMetadata(opts *bind.CallOpts, functionId [32]byte) (FaaSFunctionMetadata, error) {
+	var out []interface{}
+	err := _FaaS.contract.Call(opts, &out, "getFunctionMetadata", functionId)
+
+	if err != nil {
+		return *new(FaaSFunctionMetadata), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(FaaSFunctionMetadata)).(*FaaSFunctionMetadata)
+
+	return out0, err
+
+}
+
+// GetFunctionMetadata is a free data retrieval call binding the contract method 0x228764b2.
+//
+// Solidity: function getFunctionMetadata(bytes32 functionId) view returns((bool,bool,uint32))
+func (_FaaS *FaaSSession) GetFunctionMetadata(functionId [32]byte) (FaaSFunctionMetadata, error) {
+	return _FaaS.Contract.GetFunctionMetadata(&_FaaS.CallOpts, functionId)
+}
+
+// GetFunctionMetadata is a free data retrieval call binding the contract method 0x228764b2.
+//
+// Solidity: function getFunctionMetadata(bytes32 functionId) view returns((bool,bool,uint32))
+func (_FaaS *FaaSCallerSession) GetFunctionMetadata(functionId [32]byte) (FaaSFunctionMetadata, error) {
+	return _FaaS.Contract.GetFunctionMetadata(&_FaaS.CallOpts, functionId)
 }
 
 // GetFunctionUrl is a free data retrieval call binding the contract method 0x3292c49c.
