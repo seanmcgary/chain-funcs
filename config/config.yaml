@@ -1,8 +1,10 @@
-version: 0.0.1
 config:
     project:
-        name: fass-avs
-        version: 0.1.0
         context: devnet
+        name: my-avs
+        project_uuid: ""
+        telemetry_enabled: false
         templateBaseUrl: https://github.com/Layr-Labs/hourglass-avs-template
-        templateVersion: v0.0.11
+        templateVersion: v0.0.13
+        version: 0.1.0
+version: 0.0.2

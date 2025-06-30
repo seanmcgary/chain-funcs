@@ -1,6 +1,6 @@
 {
   "name": "FaaS",
-  "address": "0x240A60DC5e0B9013Cb8CF39aa6f9dDd8f25E40D2",
+  "address": "0x69B9aE74db4e9dF49cBb925eb96f86B4904ab275",
   "abi": [
     {
       "inputs": [
@@ -105,16 +105,59 @@
           "type": "bytes32"
         }
       ],
-      "name": "functions",
+      "name": "functionContent",
       "outputs": [
         {
           "internalType": "bytes",
-          "name": "content",
+          "name": "",
           "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "functionMetadata",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "hasContent",
+          "type": "bool"
         },
         {
+          "internalType": "bool",
+          "name": "hasUrl",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint32",
+          "name": "contentLength",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "functionUrls",
+      "outputs": [
+        {
           "internalType": "string",
-          "name": "url",
+          "name": "",
           "type": "string"
         }
       ],
@@ -166,6 +209,42 @@
           "internalType": "bytes",
           "name": "",
           "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "functionId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getFunctionMetadata",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "hasContent",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "hasUrl",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint32",
+              "name": "contentLength",
+              "type": "uint32"
+            }
+          ],
+          "internalType": "struct FaaS.FunctionMetadata",
+          "name": "",
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",

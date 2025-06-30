@@ -1,6 +1,6 @@
 {
   "name": "taskAVSRegistrar",
-  "address": "0x99aA73dA6309b8eC484eF2C95e96C131C1BBF7a0",
+  "address": "0xC2100780F828810bAaeCD3039111006E12B26CF8",
   "abi": [
     {
       "inputs": [
@@ -13,6 +13,11 @@
           "internalType": "contract IAllocationManager",
           "name": "allocationManager",
           "type": "address"
+        },
+        {
+          "internalType": "contract IKeyRegistrar",
+          "name": "keyRegistrar",
+          "type": "address"
         }
       ],
       "stateMutability": "nonpayable",
@@ -20,7 +25,7 @@
     },
     {
       "inputs": [],
-      "name": "ALLOCATION_MANAGER",
+      "name": "allocationManager",
       "outputs": [
         {
           "internalType": "contract IAllocationManager",
@@ -33,68 +38,12 @@
     },
     {
       "inputs": [],
-      "name": "AVS",
+      "name": "avs",
       "outputs": [
         {
           "internalType": "address",
           "name": "",
           "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "PUBKEY_REGISTRATION_TYPEHASH",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "calculatePubkeyRegistrationMessageHash",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint32",
-          "name": "operatorSetId",
-          "type": "uint32"
-        }
-      ],
-      "name": "currentApk",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "X",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "Y",
-          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -124,557 +73,32 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "operator",
+          "type": "address"
+        }
+      ],
+      "name": "getOperatorSocket",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
-      "name": "eip712Domain",
+      "name": "keyRegistrar",
       "outputs": [
         {
-          "internalType": "bytes1",
-          "name": "fields",
-          "type": "bytes1"
-        },
-        {
-          "internalType": "string",
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "version",
-          "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "chainId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "verifyingContract",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "salt",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "extensions",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint8",
-          "name": "operatorSetId",
-          "type": "uint8"
-        }
-      ],
-      "name": "getApk",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "X",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "Y",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct BN254.G1Point",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "operators",
-          "type": "address[]"
-        }
-      ],
-      "name": "getBatchOperatorPubkeyInfoAndSocket",
-      "outputs": [
-        {
-          "components": [
-            {
-              "components": [
-                {
-                  "components": [
-                    {
-                      "internalType": "uint256",
-                      "name": "X",
-                      "type": "uint256"
-                    },
-                    {
-                      "internalType": "uint256",
-                      "name": "Y",
-                      "type": "uint256"
-                    }
-                  ],
-                  "internalType": "struct BN254.G1Point",
-                  "name": "pubkeyG1",
-                  "type": "tuple"
-                },
-                {
-                  "components": [
-                    {
-                      "internalType": "uint256[2]",
-                      "name": "X",
-                      "type": "uint256[2]"
-                    },
-                    {
-                      "internalType": "uint256[2]",
-                      "name": "Y",
-                      "type": "uint256[2]"
-                    }
-                  ],
-                  "internalType": "struct BN254.G2Point",
-                  "name": "pubkeyG2",
-                  "type": "tuple"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "pubkeyHash",
-                  "type": "bytes32"
-                }
-              ],
-              "internalType": "struct ITaskAVSRegistrarTypes.PubkeyInfo",
-              "name": "pubkeyInfo",
-              "type": "tuple"
-            },
-            {
-              "internalType": "string",
-              "name": "socket",
-              "type": "string"
-            }
-          ],
-          "internalType": "struct ITaskAVSRegistrarTypes.PubkeyInfoAndSocket[]",
-          "name": "",
-          "type": "tuple[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "pubkeyHash",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getOperatorFromPubkeyHash",
-      "outputs": [
-        {
-          "internalType": "address",
+          "internalType": "contract IKeyRegistrar",
           "name": "",
           "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "getOperatorPubkeyG2",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256[2]",
-              "name": "X",
-              "type": "uint256[2]"
-            },
-            {
-              "internalType": "uint256[2]",
-              "name": "Y",
-              "type": "uint256[2]"
-            }
-          ],
-          "internalType": "struct BN254.G2Point",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "getOperatorPubkeyHash",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "getOperatorSocketByOperator",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "pubkeyHash",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getOperatorSocketByPubkeyHash",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "getRegisteredPubkey",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "X",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "Y",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct BN254.G1Point",
-          "name": "",
-          "type": "tuple"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "getRegisteredPubkeyInfo",
-      "outputs": [
-        {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "uint256",
-                  "name": "X",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "Y",
-                  "type": "uint256"
-                }
-              ],
-              "internalType": "struct BN254.G1Point",
-              "name": "pubkeyG1",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint256[2]",
-                  "name": "X",
-                  "type": "uint256[2]"
-                },
-                {
-                  "internalType": "uint256[2]",
-                  "name": "Y",
-                  "type": "uint256[2]"
-                }
-              ],
-              "internalType": "struct BN254.G2Point",
-              "name": "pubkeyG2",
-              "type": "tuple"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "pubkeyHash",
-              "type": "bytes32"
-            }
-          ],
-          "internalType": "struct ITaskAVSRegistrarTypes.PubkeyInfo",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "operatorToPubkey",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "X",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "Y",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "operatorToPubkeyHash",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "pubkeyHash",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "operatorToSocket",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "socket",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "socket",
-          "type": "string"
-        },
-        {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "uint256",
-                  "name": "X",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "Y",
-                  "type": "uint256"
-                }
-              ],
-              "internalType": "struct BN254.G1Point",
-              "name": "pubkeyRegistrationSignature",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint256",
-                  "name": "X",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "Y",
-                  "type": "uint256"
-                }
-              ],
-              "internalType": "struct BN254.G1Point",
-              "name": "pubkeyG1",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint256[2]",
-                  "name": "X",
-                  "type": "uint256[2]"
-                },
-                {
-                  "internalType": "uint256[2]",
-                  "name": "Y",
-                  "type": "uint256[2]"
-                }
-              ],
-              "internalType": "struct BN254.G2Point",
-              "name": "pubkeyG2",
-              "type": "tuple"
-            }
-          ],
-          "internalType": "struct ITaskAVSRegistrarTypes.PubkeyRegistrationParams",
-          "name": "pubkeyRegistrationParams",
-          "type": "tuple"
-        }
-      ],
-      "name": "packRegisterPayload",
-      "outputs": [
-        {
-          "internalType": "bytes",
-          "name": "",
-          "type": "bytes"
-        }
-      ],
-      "stateMutability": "pure",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "pubkeyHash",
-          "type": "bytes32"
-        }
-      ],
-      "name": "pubkeyHashToOperator",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "pubkeyHash",
-          "type": "bytes32"
-        }
-      ],
-      "name": "pubkeyHashToSocket",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "socket",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        }
-      ],
-      "name": "pubkeyRegistrationMessageHash",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "X",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "Y",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct BN254.G1Point",
-          "name": "",
-          "type": "tuple"
         }
       ],
       "stateMutability": "view",
@@ -712,7 +136,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "avs",
+          "name": "_avs",
           "type": "address"
         }
       ],
@@ -730,75 +154,32 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "operator",
+          "type": "address"
+        },
+        {
           "internalType": "string",
           "name": "socket",
           "type": "string"
         }
       ],
-      "name": "updateOperatorSocket",
+      "name": "updateSocket",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "anonymous": false,
-      "inputs": [],
-      "name": "EIP712DomainChanged",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
-          "internalType": "address",
-          "name": "operator",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "pubkeyHash",
-          "type": "bytes32"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "X",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "Y",
-              "type": "uint256"
-            }
-          ],
           "indexed": false,
-          "internalType": "struct BN254.G1Point",
-          "name": "pubkeyG1",
-          "type": "tuple"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint256[2]",
-              "name": "X",
-              "type": "uint256[2]"
-            },
-            {
-              "internalType": "uint256[2]",
-              "name": "Y",
-              "type": "uint256[2]"
-            }
-          ],
-          "indexed": false,
-          "internalType": "struct BN254.G2Point",
-          "name": "pubkeyG2",
-          "type": "tuple"
+          "internalType": "uint8",
+          "name": "version",
+          "type": "uint8"
         }
       ],
-      "name": "NewPubkeyRegistration",
+      "name": "Initialized",
       "type": "event"
     },
     {
@@ -811,37 +192,13 @@
           "type": "address"
         },
         {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "pubkeyHash",
-          "type": "bytes32"
-        },
-        {
-          "indexed": true,
-          "internalType": "uint32",
-          "name": "operatorSetId",
-          "type": "uint32"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "X",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "Y",
-              "type": "uint256"
-            }
-          ],
           "indexed": false,
-          "internalType": "struct BN254.G1Point",
-          "name": "apk",
-          "type": "tuple"
+          "internalType": "uint32[]",
+          "name": "operatorSetIds",
+          "type": "uint32[]"
         }
       ],
-      "name": "OperatorSetApkUpdated",
+      "name": "OperatorDeregistered",
       "type": "event"
     },
     {
@@ -854,10 +211,23 @@
           "type": "address"
         },
         {
+          "indexed": false,
+          "internalType": "uint32[]",
+          "name": "operatorSetIds",
+          "type": "uint32[]"
+        }
+      ],
+      "name": "OperatorRegistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
           "indexed": true,
-          "internalType": "bytes32",
-          "name": "pubkeyHash",
-          "type": "bytes32"
+          "internalType": "address",
+          "name": "operator",
+          "type": "address"
         },
         {
           "indexed": false,
@@ -866,78 +236,27 @@
           "type": "string"
         }
       ],
-      "name": "OperatorSocketUpdated",
+      "name": "OperatorSocketSet",
       "type": "event"
     },
     {
       "inputs": [],
-      "name": "BLSPubkeyAlreadyRegistered",
+      "name": "CallerNotOperator",
       "type": "error"
     },
     {
       "inputs": [],
-      "name": "ECAddFailed",
+      "name": "DataLengthMismatch",
       "type": "error"
     },
     {
       "inputs": [],
-      "name": "ECMulFailed",
+      "name": "KeyNotRegistered",
       "type": "error"
     },
     {
       "inputs": [],
-      "name": "ECPairingFailed",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "ExpModFailed",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidAVS",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidBLSSignatureOrPrivateKey",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidShortString",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "OnlyAllocationManager",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "OperatorAlreadyRegistered",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "OperatorNotRegistered",
-      "type": "error"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "str",
-          "type": "string"
-        }
-      ],
-      "name": "StringTooLong",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "ZeroPubKey",
+      "name": "NotAllocationManager",
       "type": "error"
     }
   ]

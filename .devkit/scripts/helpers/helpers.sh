@@ -55,11 +55,19 @@ function ensureGomplate() {
     fi
 }
 
+function ensureCast() {
+    if ! command -v cast &> /dev/null; then
+        log "Error: cast not found. Please run 'avs create' first."
+        exit 1
+    fi
+}
+
 # Pass in RPC_URL ($1)
 function ensureDockerHost() {
     # Detect OS and default DOCKERS_HOST when not provided
     if [[ "$(uname)" == "Linux" ]]; then
-        DOCKERS_HOST=${DOCKERS_HOST:-172.17.0.1}
+        # Lookup the host using iproute
+        DOCKERS_HOST=${DOCKERS_HOST:-$(ip addr show docker0 | awk '/inet /{print $2}' | cut -d/ -f1)}
     else
         DOCKERS_HOST=${DOCKERS_HOST:-host.docker.internal}
     fi

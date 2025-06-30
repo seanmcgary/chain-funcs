@@ -25,7 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/seanmcgary/fass-avs/clients/bindings"
+	"github.com/seanmcgary/fass-avs/clients/pkg/bindings/FaaS"
 	"github.com/urfave/cli/v2"
 )
 
@@ -74,7 +74,7 @@ func registerFunction(c *cli.Context) error {
 	auth.GasPrice = gasPrice
 
 	// Create FaaS contract instance
-	faas, err := bindings.NewFaaS(common.HexToAddress(faasAddress), client)
+	faas, err := FaaS.NewFaaS(common.HexToAddress(faasAddress), client)
 	if err != nil {
 		return fmt.Errorf("failed to create FaaS contract instance: %w", err)
 	}
@@ -84,7 +84,7 @@ func registerFunction(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to check function type: %w", err)
 	}
-	
+
 	var finalFunctionDir string
 	if isPythonFunction && !skipDeps {
 		// Create a temporary directory with dependencies installed
@@ -193,7 +193,7 @@ func deployFunction(c *cli.Context) error {
 	auth.GasPrice = gasPrice
 
 	// Create FaaS contract instance
-	faas, err := bindings.NewFaaS(common.HexToAddress(faasAddress), client)
+	faas, err := FaaS.NewFaaS(common.HexToAddress(faasAddress), client)
 	if err != nil {
 		return fmt.Errorf("failed to create FaaS contract instance: %w", err)
 	}
@@ -203,7 +203,7 @@ func deployFunction(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to check function type: %w", err)
 	}
-	
+
 	var finalFunctionDir string
 	if isPythonFunction && !skipDeps {
 		// Create a temporary directory with dependencies installed
@@ -236,9 +236,9 @@ func deployFunction(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to upload to S3: %w", err)
 	}
-	
+
 	fmt.Printf("Uploaded to S3: %s\n", s3URL)
-	
+
 	// Call deployFunction with URL
 	tx, err := faas.DeployFunction(auth, s3URL, functionID)
 	if err != nil {
@@ -320,7 +320,7 @@ func callFunction(c *cli.Context) error {
 	functionID := common.HexToHash(functionIDHex)
 
 	// Create FaaS contract instance
-	faas, err := bindings.NewFaaS(common.HexToAddress(faasAddress), client)
+	faas, err := FaaS.NewFaaS(common.HexToAddress(faasAddress), client)
 	if err != nil {
 		return fmt.Errorf("failed to create FaaS contract instance: %w", err)
 	}
@@ -356,15 +356,17 @@ func callFunction(c *cli.Context) error {
 
 	// Extract task ID from logs
 	var taskID [32]byte
-	faasFilterer, err := bindings.NewFaaSFilterer(common.HexToAddress(faasAddress), client)
+	faasFilterer, err := FaaS.NewFaaSFilterer(common.HexToAddress(faasAddress), client)
 	if err != nil {
 		return fmt.Errorf("failed to create FaaS filterer: %w", err)
 	}
 
 	// Parse logs to find the FunctionCalled event
+	fmt.Printf("Logs: %+v\n", receipt)
 	for _, log := range receipt.Logs {
 		if len(log.Topics) > 0 && log.Address == common.HexToAddress(faasAddress) {
 			event, err := faasFilterer.ParseFunctionCalled(*log)
+			fmt.Printf("Event: %+v\n", event)
 			if err == nil && event.FunctionId == functionID {
 				taskID = event.TaskId
 				break
@@ -580,14 +582,14 @@ func uploadToS3(tarballData []byte, functionID common.Hash, s3BaseURL string) (s
 	if err != nil {
 		return "", fmt.Errorf("invalid S3 base URL: %w", err)
 	}
-	
+
 	if parsedURL.Scheme != "s3" {
 		return "", fmt.Errorf("S3 base URL must start with s3://")
 	}
-	
+
 	bucket := parsedURL.Host
 	prefix := strings.TrimPrefix(parsedURL.Path, "/")
-	
+
 	// Use function ID as filename - ensure proper path separator
 	var key string
 	if prefix == "" {
@@ -595,27 +597,27 @@ func uploadToS3(tarballData []byte, functionID common.Hash, s3BaseURL string) (s
 	} else {
 		key = fmt.Sprintf("%s/%s.tar.gz", prefix, functionID.Hex())
 	}
-	
+
 	// Create AWS session with automatic credential resolution
 	sessOptions := session.Options{
 		SharedConfigState: session.SharedConfigEnable, // Enable ~/.aws/config parsing
 	}
-	
+
 	if profile := os.Getenv("AWS_PROFILE"); profile != "" {
 		fmt.Printf("Using AWS profile: %s\n", profile)
 		// AWS_PROFILE env var will be automatically used by the session
 	} else {
 		fmt.Println("No AWS_PROFILE set, using default credentials")
 	}
-	
+
 	sess, err := session.NewSessionWithOptions(sessOptions)
 	if err != nil {
 		return "", fmt.Errorf("failed to create AWS session: %w", err)
 	}
-	
+
 	// Create S3 service client
 	s3Client := s3.New(sess)
-	
+
 	// Upload the tarball
 	_, err = s3Client.PutObject(&s3.PutObjectInput{
 		Bucket:      aws.String(bucket),
@@ -626,7 +628,7 @@ func uploadToS3(tarballData []byte, functionID common.Hash, s3BaseURL string) (s
 	if err != nil {
 		return "", fmt.Errorf("failed to upload to S3: %w", err)
 	}
-	
+
 	// Return the public HTTPS URL
 	return fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucket, key), nil
 }
@@ -634,7 +636,7 @@ func uploadToS3(tarballData []byte, functionID common.Hash, s3BaseURL string) (s
 // checkIsPythonFunction determines if this is a Python function using manifest.json
 func checkIsPythonFunction(functionDir string) (bool, error) {
 	manifestPath := filepath.Join(functionDir, "manifest.json")
-	
+
 	// Read manifest.json
 	manifestData, err := os.ReadFile(manifestPath)
 	if err != nil {
@@ -643,16 +645,16 @@ func checkIsPythonFunction(functionDir string) (bool, error) {
 		}
 		return false, err
 	}
-	
+
 	// Parse manifest.json
 	var manifest struct {
 		Runtime string `json:"runtime"`
 	}
-	
+
 	if err := json.Unmarshal(manifestData, &manifest); err != nil {
 		return false, fmt.Errorf("failed to parse manifest.json: %w", err)
 	}
-	
+
 	// Validate runtime
 	switch manifest.Runtime {
 	case "python":
