@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//go:embed contracts/taskMailbox.json
+//go:embed contracts/TaskMailbox.json
 var taskMailboxJSON []byte
 
 //go:embed contracts/FaaS.json

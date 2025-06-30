@@ -25,7 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/seanmcgary/fass-avs/clients/bindings"
+	"github.com/seanmcgary/fass-avs/clients/pkg/bindings/FaaS"
 	"github.com/urfave/cli/v2"
 )
 
@@ -74,7 +74,7 @@ func registerFunction(c *cli.Context) error {
 	auth.GasPrice = gasPrice
 
 	// Create FaaS contract instance
-	faas, err := bindings.NewFaaS(common.HexToAddress(faasAddress), client)
+	faas, err := FaaS.NewFaaS(common.HexToAddress(faasAddress), client)
 	if err != nil {
 		return fmt.Errorf("failed to create FaaS contract instance: %w", err)
 	}
@@ -193,7 +193,7 @@ func deployFunction(c *cli.Context) error {
 	auth.GasPrice = gasPrice
 
 	// Create FaaS contract instance
-	faas, err := bindings.NewFaaS(common.HexToAddress(faasAddress), client)
+	faas, err := FaaS.NewFaaS(common.HexToAddress(faasAddress), client)
 	if err != nil {
 		return fmt.Errorf("failed to create FaaS contract instance: %w", err)
 	}
@@ -320,7 +320,7 @@ func callFunction(c *cli.Context) error {
 	functionID := common.HexToHash(functionIDHex)
 
 	// Create FaaS contract instance
-	faas, err := bindings.NewFaaS(common.HexToAddress(faasAddress), client)
+	faas, err := FaaS.NewFaaS(common.HexToAddress(faasAddress), client)
 	if err != nil {
 		return fmt.Errorf("failed to create FaaS contract instance: %w", err)
 	}
@@ -356,7 +356,7 @@ func callFunction(c *cli.Context) error {
 
 	// Extract task ID from logs
 	var taskID [32]byte
-	faasFilterer, err := bindings.NewFaaSFilterer(common.HexToAddress(faasAddress), client)
+	faasFilterer, err := FaaS.NewFaaSFilterer(common.HexToAddress(faasAddress), client)
 	if err != nil {
 		return fmt.Errorf("failed to create FaaS filterer: %w", err)
 	}
