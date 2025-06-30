@@ -106,3 +106,14 @@ or
 #### Python Functions:
 - Contain `handler.py` at the root with `def handler(args): ...`
 - Include requirements.txt and any dependencies needed
+
+## Development Resources
+
+### Documentation Lookup
+When working on frontend development or looking up library documentation, use the **Context7 MCP server** which provides access to up-to-date documentation for:
+- React, Vite, and other frontend frameworks
+- Web3 libraries (Wagmi, Viem)
+- UI component libraries (Tailwind CSS, shadcn/ui)
+- JavaScript/TypeScript APIs and best practices
+
+Use Context7 to quickly resolve API questions and implementation patterns during development.
