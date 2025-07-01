@@ -37,3 +37,6 @@ config/contexts/**/*
 .env
 
 clients/bin
+
+
+node_modules

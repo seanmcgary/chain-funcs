@@ -1,7 +1,14 @@
-# FaaS AVS Frontend Implementation Plan
+# ChainFuncs Frontend Implementation Plan
 
 ## Overview
-This document outlines the implementation plan for a fully client-side web application (dApp) for the FaaS AVS platform. The frontend will be a static site that can be hosted on any static hosting provider while providing full functionality for function development, deployment, and execution.
+This document outlines the implementation plan for a fully client-side web application (dApp) for the ChainFuncs platform (formerly FaaS AVS). The frontend will be a static site that can be hosted on any static hosting provider while providing full functionality for function development, deployment, and execution.
+
+## Implementation Status
+**Current Status**: Milestone 1 Complete ✅ + Partial Milestone 2 & 5
+- ✅ **Milestone 1**: Project Setup & Foundation - COMPLETE
+- 🔄 **Milestone 2**: Function Editor - IN PROGRESS (syntax highlighting added)
+- 🔄 **Milestone 5**: Function Browser - IN PROGRESS (basic UI implemented)
+- 🎨 **Branding**: Updated from "FaaS AVS" to "ChainFuncs" throughout
 
 ## Technical Architecture
 
@@ -46,18 +53,18 @@ frontend/
 **Goal**: Establish project foundation with wallet connectivity
 
 #### Tasks:
-- [ ] Initialize Vite React project with TypeScript
-- [ ] Set up Tailwind CSS and shadcn/ui
-- [ ] Configure Wagmi and Viem for Web3 integration
-- [ ] Create basic app shell with navigation
-- [ ] Implement wallet connection component
-- [ ] Set up contract configuration using existing ABIs
-- [ ] Test wallet connection with MetaMask/WalletConnect
+- [x] Initialize Vite React project with TypeScript
+- [x] Set up Tailwind CSS and shadcn/ui
+- [x] Configure Wagmi and Viem for Web3 integration
+- [x] Create basic app shell with navigation
+- [x] Implement wallet connection component
+- [x] Set up contract configuration using existing ABIs
+- [x] Test wallet connection with MetaMask/WalletConnect
 
 **Deliverables**:
-- [ ] Working app with wallet connection
-- [ ] Basic UI layout and navigation
-- [ ] Contract configuration imported from clients/
+- [x] Working app with wallet connection
+- [x] Basic UI layout and navigation
+- [x] Contract configuration imported from clients/
 
 **Estimated Time**: 3-4 days
 
@@ -70,9 +77,9 @@ frontend/
 - [ ] Integrate Monaco Editor with React
 - [ ] Create file tree component for project structure
 - [ ] Implement manifest.json editor with validation
-- [ ] Add syntax highlighting for JavaScript and Python
-- [ ] Create function templates (starter projects)
-- [ ] Implement local project save/load functionality
+- [x] Add syntax highlighting for JavaScript and Python
+- [x] Create function templates (starter projects)
+- [x] Implement local project save/load functionality
 - [ ] Add function structure validation
 - [ ] Create import/export functionality for function projects
 
@@ -133,9 +140,9 @@ frontend/
 **Goal**: Browse and discover deployed functions
 
 #### Tasks:
-- [ ] Create function listing interface
-- [ ] Implement function search and filtering
-- [ ] Add function metadata display
+- [x] Create function listing interface
+- [x] Implement function search and filtering
+- [x] Add function metadata display
 - [ ] Show deployment information (on-chain vs remote)
 - [ ] Create function detail view
 - [ ] Add function favoriting/bookmarking
@@ -252,11 +259,11 @@ frontend/
 - [ ] Application works entirely client-side with no backend dependencies
 
 ### Technical Requirements
-- [ ] Application builds to static files deployable anywhere
-- [ ] Works with major Web3 wallets (MetaMask, WalletConnect)
-- [ ] Compatible with existing CLI-deployed functions
-- [ ] Responsive design works on desktop and mobile
-- [ ] Fast loading and good performance
+- [x] Application builds to static files deployable anywhere
+- [x] Works with major Web3 wallets (MetaMask, WalletConnect)
+- [x] Compatible with existing CLI-deployed functions
+- [x] Responsive design works on desktop and mobile
+- [x] Fast loading and good performance
 
 ### User Experience Requirements
 - [ ] Intuitive interface for Web3 newcomers
