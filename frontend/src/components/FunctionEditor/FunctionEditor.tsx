@@ -9,7 +9,8 @@ import { FileTree, type FileNode } from "@/components/ui/file-tree"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { validateManifest, validateFunctionStructure, generateManifestTemplate, generateFunctionTemplate } from "@/lib/validation"
-import { AlertTriangle, CheckCircle, GripHorizontal } from "lucide-react"
+import { AlertTriangle, CheckCircle, GripHorizontal, Download, Upload, Save, FolderOpen } from "lucide-react"
+import { exportProject, exportProjectAsZip, importProject, importProjectFromZip, saveProjectToLocalStorage, loadProjectFromLocalStorage } from "@/lib/project-utils"
 
 const FunctionEditor = () => {
   const [functionName, setFunctionName] = useState('hello-world')
@@ -193,6 +194,60 @@ const FunctionEditor = () => {
   const allWarnings = validationResult ? 
     [...validationResult.manifest.warnings, ...validationResult.structure.warnings] : []
 
+  // Handle project import/export functionality
+  const handleExportProject = () => {
+    exportProject(functionName, files)
+  }
+
+  const handleExportAsZip = async () => {
+    try {
+      await exportProjectAsZip(functionName, files)
+    } catch (error) {
+      console.error('Failed to export as ZIP:', error)
+      alert('Failed to export project as ZIP')
+    }
+  }
+
+  const handleImportProject = async () => {
+    try {
+      const project = await importProject()
+      setFunctionName(project.name)
+      setFiles(project.files)
+      setSelectedFileId(project.files.length > 0 ? project.files[0].id : '')
+    } catch (error) {
+      console.error('Failed to import project:', error)
+      alert('Failed to import project')
+    }
+  }
+
+  const handleImportFromZip = async () => {
+    try {
+      const { name, files: importedFiles } = await importProjectFromZip()
+      setFunctionName(name)
+      setFiles(importedFiles)
+      setSelectedFileId(importedFiles.length > 0 ? importedFiles[0].id : '')
+    } catch (error) {
+      console.error('Failed to import from ZIP:', error)
+      alert('Failed to import project from ZIP')
+    }
+  }
+
+  const handleSaveToLocalStorage = () => {
+    saveProjectToLocalStorage(functionName, files)
+    alert('Project saved to local storage')
+  }
+
+  const handleLoadFromLocalStorage = () => {
+    const project = loadProjectFromLocalStorage(functionName)
+    if (project) {
+      setFiles(project.files)
+      setSelectedFileId(project.files.length > 0 ? project.files[0].id : '')
+      alert('Project loaded from local storage')
+    } else {
+      alert('No saved project found with this name')
+    }
+  }
+
   // Handle resize functionality
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsResizing(true)
@@ -250,22 +305,24 @@ const FunctionEditor = () => {
 
   return (
     <div className="h-full bg-background flex flex-col">
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="border-b bg-card p-4 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">Function Editor</h1>
-              <p className="text-muted-foreground">
-                Create and edit JavaScript/Python functions for deployment on the ChainFuncs network
-              </p>
-            </div>
+      {/* Full Width Header */}
+      <div className="border-b bg-card p-4 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Function Editor</h1>
+            <p className="text-muted-foreground">
+              Create and edit JavaScript/Python functions for deployment on the ChainFuncs network
+            </p>
           </div>
         </div>
-        
-        {/* Function Controls */}
-        <div className="border-b bg-card p-4 flex-shrink-0">
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Main Editor Section */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Function Controls */}
+          <div className="border-b bg-card p-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
               <Label htmlFor="function-name">Function Name</Label>
@@ -410,23 +467,89 @@ const FunctionEditor = () => {
               )}
             </div>
           </div>
-          
-          {/* Right Sidebar */}
-          <div className="w-80 border-l bg-card flex flex-col">
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
-              <WalletStatus />
-              <ContractInfo />
-            </div>
+          </div>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="w-80 border-l bg-card flex flex-col">
+          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            <WalletStatus />
+            <ContractInfo />
           </div>
         </div>
       </div>
 
       {/* Sticky Action Bar */}
       <div className="border-t bg-card p-4 flex-shrink-0 shadow-lg">
-        <div className="flex gap-4">
-          <Button>Save Function</Button>
-          <Button variant="outline">Test Locally</Button>
-          <Button variant="outline">Download Project</Button>
+        <div className="flex items-center justify-between">
+          {/* Main Actions */}
+          <div className="flex gap-4">
+            <Button>Save Function</Button>
+            <Button variant="outline">Test Locally</Button>
+          </div>
+          
+          {/* Project Management */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSaveToLocalStorage}
+              title="Save to browser storage"
+            >
+              <Save className="h-4 w-4 mr-1" />
+              Save Project
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLoadFromLocalStorage}
+              title="Load from browser storage"
+            >
+              <FolderOpen className="h-4 w-4 mr-1" />
+              Load Project
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportProject}
+              title="Export as JSON file"
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Export JSON
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportAsZip}
+              title="Export as ZIP archive"
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Export ZIP
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleImportProject}
+              title="Import from JSON file"
+            >
+              <Upload className="h-4 w-4 mr-1" />
+              Import JSON
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleImportFromZip}
+              title="Import from ZIP archive"
+            >
+              <Upload className="h-4 w-4 mr-1" />
+              Import ZIP
+            </Button>
+          </div>
         </div>
       </div>
     </div>
