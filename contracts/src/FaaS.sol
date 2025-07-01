@@ -14,6 +14,8 @@ contract FaaS {
         bool hasContent;    // 1 byte
         bool hasUrl;        // 1 byte 
         uint32 contentLength; // 4 bytes - fits in same slot with bools
+        address registrar;  // 20 bytes - fits in next slot
+        uint32 timestamp;   // 4 bytes - fits in same slot with registrar
     }
     
     // Legacy struct for compatibility
@@ -22,13 +24,29 @@ contract FaaS {
         string url;
     }
     
+    // Function listing data for pagination
+    struct FunctionInfo {
+        bytes32 functionId;
+        string name;
+        address registrar;
+        uint32 timestamp;
+        bool hasContent;
+        bool hasUrl;
+        uint32 contentLength;
+    }
+    
     // Separate mappings to avoid loading unnecessary data
     mapping(bytes32 => FunctionMetadata) public functionMetadata;
     mapping(bytes32 => bytes) public functionContent;
     mapping(bytes32 => string) public functionUrls;
+    mapping(bytes32 => string) public functionNames;
     
-    event FunctionRegistered(bytes32 indexed functionId, address indexed registrar);
-    event FunctionDeployed(bytes32 indexed functionId, string indexed url, bytes32 indexed digest, address registrar);
+    // Function listing arrays for pagination
+    bytes32[] public functionIds;
+    mapping(bytes32 => uint256) public functionIndex; // 1-based index (0 means not exists)
+    
+    event FunctionRegistered(bytes32 indexed functionId, string name, address indexed registrar);
+    event FunctionDeployed(bytes32 indexed functionId, string name, string indexed url, bytes32 indexed digest, address registrar);
     event FunctionCalled(bytes32 indexed functionId, bytes32 indexed taskId, address indexed caller);
     
     struct FunctionCall {
@@ -44,31 +62,52 @@ contract FaaS {
         executorOperatorSetId = _executorOperatorSetId;
     }
     
-    function registerFunction(bytes memory content) external returns (bytes32) {
-        bytes32 functionId = keccak256(content);
+    function registerFunction(string memory name, bytes memory content) external returns (bytes32) {
+        require(bytes(name).length > 0, "Function name cannot be empty");
         
-        // Only store what's needed - no empty strings
+        bytes32 functionId = keccak256(abi.encodePacked(msg.sender, name, content));
+        require(functionIndex[functionId] == 0, "Function already exists");
+        
+        // Store function metadata
         functionMetadata[functionId] = FunctionMetadata({
             hasContent: true,
             hasUrl: false,
-            contentLength: uint32(content.length)
+            contentLength: uint32(content.length),
+            registrar: msg.sender,
+            timestamp: uint32(block.timestamp)
         });
         functionContent[functionId] = content;
+        functionNames[functionId] = name;
         
-        emit FunctionRegistered(functionId, msg.sender);
+        // Add to listing array
+        functionIds.push(functionId);
+        functionIndex[functionId] = functionIds.length; // 1-based index
+        
+        emit FunctionRegistered(functionId, name, msg.sender);
         return functionId;
     }
     
-    function deployFunction(string memory url, bytes32 digest) external returns (bytes32) {
-        // Only store what's needed - no empty bytes
+    function deployFunction(string memory name, string memory url, bytes32 digest) external returns (bytes32) {
+        require(bytes(name).length > 0, "Function name cannot be empty");
+        require(bytes(url).length > 0, "Function URL cannot be empty");
+        require(functionIndex[digest] == 0, "Function already exists");
+        
+        // Store function metadata
         functionMetadata[digest] = FunctionMetadata({
             hasContent: false,
             hasUrl: true,
-            contentLength: 0
+            contentLength: 0,
+            registrar: msg.sender,
+            timestamp: uint32(block.timestamp)
         });
         functionUrls[digest] = url;
+        functionNames[digest] = name;
         
-        emit FunctionDeployed(digest, url, digest, msg.sender);
+        // Add to listing array
+        functionIds.push(digest);
+        functionIndex[digest] = functionIds.length; // 1-based index
+        
+        emit FunctionDeployed(digest, name, url, digest, msg.sender);
         return digest;
     }
     
@@ -131,5 +170,95 @@ contract FaaS {
     // New optimized getter for metadata only
     function getFunctionMetadata(bytes32 functionId) external view returns (FunctionMetadata memory) {
         return functionMetadata[functionId];
+    }
+    
+    function getFunctionName(bytes32 functionId) external view returns (string memory) {
+        return functionNames[functionId];
+    }
+    
+    function getTotalFunctions() external view returns (uint256) {
+        return functionIds.length;
+    }
+    
+    function listFunctions(uint256 offset, uint256 limit) external view returns (FunctionInfo[] memory functions, uint256 total) {
+        total = functionIds.length;
+        
+        if (offset >= total) {
+            return (new FunctionInfo[](0), total);
+        }
+        
+        uint256 end = offset + limit;
+        if (end > total) {
+            end = total;
+        }
+        
+        uint256 length = end - offset;
+        functions = new FunctionInfo[](length);
+        
+        for (uint256 i = 0; i < length; i++) {
+            bytes32 functionId = functionIds[offset + i];
+            FunctionMetadata memory metadata = functionMetadata[functionId];
+            
+            functions[i] = FunctionInfo({
+                functionId: functionId,
+                name: functionNames[functionId],
+                registrar: metadata.registrar,
+                timestamp: metadata.timestamp,
+                hasContent: metadata.hasContent,
+                hasUrl: metadata.hasUrl,
+                contentLength: metadata.contentLength
+            });
+        }
+        
+        return (functions, total);
+    }
+    
+    function listFunctionsByRegistrar(address registrar, uint256 offset, uint256 limit) external view returns (FunctionInfo[] memory functions, uint256 total) {
+        // First count functions by this registrar
+        uint256 count = 0;
+        for (uint256 i = 0; i < functionIds.length; i++) {
+            if (functionMetadata[functionIds[i]].registrar == registrar) {
+                count++;
+            }
+        }
+        
+        total = count;
+        if (offset >= total) {
+            return (new FunctionInfo[](0), total);
+        }
+        
+        uint256 end = offset + limit;
+        if (end > total) {
+            end = total;
+        }
+        
+        uint256 length = end - offset;
+        functions = new FunctionInfo[](length);
+        
+        uint256 found = 0;
+        uint256 added = 0;
+        
+        for (uint256 i = 0; i < functionIds.length && added < length; i++) {
+            bytes32 functionId = functionIds[i];
+            FunctionMetadata memory metadata = functionMetadata[functionId];
+            
+            if (metadata.registrar == registrar) {
+                if (found >= offset) {
+                    functions[added] = FunctionInfo({
+                        functionId: functionId,
+                        name: functionNames[functionId],
+                        registrar: metadata.registrar,
+                        timestamp: metadata.timestamp,
+                        hasContent: metadata.hasContent,
+                        hasUrl: metadata.hasUrl,
+                        contentLength: metadata.contentLength
+                    });
+                    added++;
+                }
+                found++;
+            }
+        }
+        
+        return (functions, total);
     }
 }

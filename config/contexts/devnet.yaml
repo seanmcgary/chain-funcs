@@ -26,7 +26,7 @@ context:
     bls_private_key: 0x2ba58f64c57faa1073d63add89799f2a0101855a8b289b1330cb500758d5d1ee
     active_stake_roots:
       - chain_id: 31337
-        stake_root: 0x50322e11fb32a88de6146a5b8ce223b8047b86d685d5622cdd72e7f43b8831e0
+        stake_root: 0xf553378f6347e89f3ea812e2908dc655074189e85894294f1848d64a549ac101
   # All key material (BLS and ECDSA) within this file should be used for local testing ONLY
   # ECDSA keys used are from Anvil's private key set
   # BLS keystores are deterministically pre-generated and embedded. These are NOT derived from a secure seed

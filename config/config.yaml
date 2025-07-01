@@ -2,8 +2,8 @@ config:
     project:
         context: devnet
         name: my-avs
-        project_uuid: ""
-        telemetry_enabled: false
+        project_uuid: "seanmcgary:chain-funcs"
+        telemetry_enabled: true
         templateBaseUrl: https://github.com/Layr-Labs/hourglass-avs-template
         templateVersion: v0.0.13
         version: 0.1.0

@@ -17,7 +17,7 @@ func main() {
 
 	app := &cli.App{
 		Name:  "faas-cli",
-		Usage: "CLI for interacting with the FaaS AVS contract",
+		Usage: "CLI for interacting with the ChainFuncs contract",
 		Commands: []*cli.Command{
 			{
 				Name:  "register-function",
@@ -37,7 +37,7 @@ func main() {
 					},
 					&cli.StringFlag{
 						Name:     "faas-address",
-						Usage:    "FaaS contract address",
+						Usage:    "ChainFuncs contract address",
 						Value:    config.GetFaaSAddress(),
 						EnvVars:  []string{"FAAS_ADDRESS"},
 					},
@@ -47,7 +47,7 @@ func main() {
 						EnvVars: []string{"SKIP_DEPS"},
 					},
 				},
-				ArgsUsage: "<function-directory>",
+				ArgsUsage: "<function-name> <function-directory>",
 				Action:    registerFunction,
 			},
 			{
@@ -68,7 +68,7 @@ func main() {
 					},
 					&cli.StringFlag{
 						Name:     "faas-address",
-						Usage:    "FaaS contract address",
+						Usage:    "ChainFuncs contract address",
 						Value:    config.GetFaaSAddress(),
 						EnvVars:  []string{"FAAS_ADDRESS"},
 					},
@@ -84,7 +84,7 @@ func main() {
 						EnvVars: []string{"SKIP_DEPS"},
 					},
 				},
-				ArgsUsage: "<function-directory>",
+				ArgsUsage: "<function-name> <function-directory>",
 				Action:    deployFunction,
 			},
 			{
@@ -131,6 +131,62 @@ func main() {
 				Action:    callFunction,
 			},
 			{
+				Name:  "list-functions",
+				Usage: "List deployed functions with pagination",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "rpc-url",
+						Usage:    "Ethereum RPC URL",
+						Value:    config.GetDefaultRPCURL(),
+						EnvVars:  []string{"RPC_URL"},
+					},
+					&cli.StringFlag{
+						Name:     "faas-address",
+						Usage:    "ChainFuncs contract address",
+						Value:    config.GetFaaSAddress(),
+						EnvVars:  []string{"FAAS_ADDRESS"},
+					},
+					&cli.StringFlag{
+						Name:    "registrar",
+						Usage:   "Filter functions by registrar address",
+						EnvVars: []string{"REGISTRAR"},
+					},
+					&cli.Uint64Flag{
+						Name:    "offset",
+						Usage:   "Pagination offset (default: 0)",
+						Value:   0,
+						EnvVars: []string{"OFFSET"},
+					},
+					&cli.Uint64Flag{
+						Name:    "limit",
+						Usage:   "Number of functions to return (default: 10)",
+						Value:   10,
+						EnvVars: []string{"LIMIT"},
+					},
+				},
+				Action: listFunctions,
+			},
+			{
+				Name:  "function-info",
+				Usage: "Get detailed information about a specific function",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "rpc-url",
+						Usage:    "Ethereum RPC URL",
+						Value:    config.GetDefaultRPCURL(),
+						EnvVars:  []string{"RPC_URL"},
+					},
+					&cli.StringFlag{
+						Name:     "faas-address",
+						Usage:    "ChainFuncs contract address",
+						Value:    config.GetFaaSAddress(),
+						EnvVars:  []string{"FAAS_ADDRESS"},
+					},
+				},
+				ArgsUsage: "<function-id>",
+				Action:    getFunctionInfo,
+			},
+			{
 				Name:  "config",
 				Usage: "Show embedded contract configuration",
 				Action: func(c *cli.Context) error {
@@ -138,7 +194,7 @@ func main() {
 					fmt.Printf("RPC URL: %s\n", config.GetDefaultRPCURL())
 					fmt.Printf("WebSocket RPC URL: %s\n", config.GetDefaultWSRPCURL())
 					fmt.Printf("TaskMailbox Address: %s\n", config.GetTaskMailboxAddress())
-					fmt.Printf("FaaS Address: %s\n", config.GetFaaSAddress())
+					fmt.Printf("ChainFuncs Address: %s\n", config.GetFaaSAddress())
 					fmt.Printf("\nNote: These addresses are embedded at compile time from devnet deployment.\n")
 					fmt.Printf("Use flags or environment variables to override these defaults.\n")
 					return nil
