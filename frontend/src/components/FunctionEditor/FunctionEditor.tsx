@@ -9,8 +9,10 @@ import { FileTree, type FileNode } from "@/components/ui/file-tree"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { validateManifest, validateFunctionStructure, generateManifestTemplate, generateFunctionTemplate } from "@/lib/validation"
-import { AlertTriangle, CheckCircle, GripHorizontal, Download, Upload, Save, FolderOpen } from "lucide-react"
+import { AlertTriangle, CheckCircle, GripHorizontal, Download, Upload, Save, FolderOpen, Package } from "lucide-react"
 import { exportProject, exportProjectAsZip, importProject, importProjectFromZip, saveProjectToLocalStorage, loadProjectFromLocalStorage } from "@/lib/project-utils"
+import { exportProjectAsTarball, previewTarball, validateTarball } from "@/lib/tarball"
+import { TarballPreview } from "@/components/ui/tarball-preview"
 
 const FunctionEditor = () => {
   const [functionName, setFunctionName] = useState('hello-world')
@@ -245,6 +247,15 @@ const FunctionEditor = () => {
       alert('Project loaded from local storage')
     } else {
       alert('No saved project found with this name')
+    }
+  }
+
+  const handleExportTarball = async () => {
+    try {
+      await exportProjectAsTarball(functionName, files)
+    } catch (error) {
+      console.error('Failed to export tarball:', error)
+      alert(`Failed to export tarball: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -484,7 +495,17 @@ const FunctionEditor = () => {
         <div className="flex items-center justify-between">
           {/* Main Actions */}
           <div className="flex gap-4">
-            <Button>Save Function</Button>
+            <Button 
+              onClick={handleExportTarball}
+              disabled={!isProjectValid}
+            >
+              <Package className="h-4 w-4 mr-2" />
+              Deploy Tarball
+            </Button>
+            <TarballPreview 
+              files={files} 
+              functionName={functionName} 
+            />
             <Button variant="outline">Test Locally</Button>
           </div>
           
