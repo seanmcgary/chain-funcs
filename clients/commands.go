@@ -30,15 +30,20 @@ import (
 )
 
 func registerFunction(c *cli.Context) error {
-	if c.NArg() != 1 {
-		return fmt.Errorf("expected exactly one argument: function directory path")
+	if c.NArg() != 2 {
+		return fmt.Errorf("expected exactly two arguments: function name and function directory path")
 	}
 
-	functionDir := c.Args().Get(0)
+	functionName := c.Args().Get(0)
+	functionDir := c.Args().Get(1)
 	rpcURL := c.String("rpc-url")
 	privateKeyHex := c.String("private-key")
 	faasAddress := c.String("faas-address")
 	skipDeps := c.Bool("skip-deps")
+
+	if functionName == "" {
+		return fmt.Errorf("function name cannot be empty")
+	}
 
 	// Connect to Ethereum client
 	client, err := ethclient.Dial(rpcURL)
@@ -106,13 +111,14 @@ func registerFunction(c *cli.Context) error {
 		return fmt.Errorf("failed to create tarball: %w", err)
 	}
 
+	// Calculate function ID using current contract method (content hash only)
 	functionID := crypto.Keccak256Hash(tarballData)
-	fmt.Printf("Registering function from directory: %s\n", functionDir)
+	fmt.Printf("Registering function '%s' from directory: %s\n", functionName, functionDir)
 	fmt.Printf("Tarball size: %d bytes\n", len(tarballData))
 	fmt.Printf("Function ID: %s\n", functionID.Hex())
 	fmt.Printf("Using chain ID: %s\n", chainID.String())
 
-	// Register function with embedded content (on-chain storage)
+	// Register function with embedded content (on-chain storage) - using old interface for now
 	tx, err := faas.RegisterFunction(auth, tarballData)
 	if err != nil {
 		return fmt.Errorf("failed to register function: %w", err)
@@ -144,16 +150,21 @@ func registerFunction(c *cli.Context) error {
 }
 
 func deployFunction(c *cli.Context) error {
-	if c.NArg() != 1 {
-		return fmt.Errorf("expected exactly one argument: function directory path")
+	if c.NArg() != 2 {
+		return fmt.Errorf("expected exactly two arguments: function name and function directory path")
 	}
 
-	functionDir := c.Args().Get(0)
+	functionName := c.Args().Get(0)
+	functionDir := c.Args().Get(1)
 	rpcURL := c.String("rpc-url")
 	privateKeyHex := c.String("private-key")
 	faasAddress := c.String("faas-address")
 	s3BaseURL := c.String("s3-base-url")
 	skipDeps := c.Bool("skip-deps")
+
+	if functionName == "" {
+		return fmt.Errorf("function name cannot be empty")
+	}
 
 	if s3BaseURL == "" {
 		return fmt.Errorf("s3-base-url is required for deploy-function command. Use register-function for on-chain storage.")
@@ -225,8 +236,10 @@ func deployFunction(c *cli.Context) error {
 		return fmt.Errorf("failed to create tarball: %w", err)
 	}
 
+	// Calculate function ID using current contract method (content hash only)
 	functionID := crypto.Keccak256Hash(tarballData)
-	fmt.Printf("Deploying function from directory: %s\n", functionDir)
+	
+	fmt.Printf("Deploying function '%s' from directory: %s\n", functionName, functionDir)
 	fmt.Printf("Tarball size: %d bytes\n", len(tarballData))
 	fmt.Printf("Function ID: %s\n", functionID.Hex())
 	fmt.Printf("Using chain ID: %s\n", chainID.String())
@@ -239,7 +252,7 @@ func deployFunction(c *cli.Context) error {
 
 	fmt.Printf("Uploaded to S3: %s\n", s3URL)
 
-	// Call deployFunction with URL
+	// Call deployFunction with URL - using old interface for now
 	tx, err := faas.DeployFunction(auth, s3URL, functionID)
 	if err != nil {
 		return fmt.Errorf("failed to deploy function: %w", err)
@@ -389,6 +402,68 @@ func callFunction(c *cli.Context) error {
 
 	// Subscribe to TaskVerified events using WebSocket client
 	return subscribeToTaskVerified(wsRPCURL, taskMailboxAddress, taskID)
+}
+
+func listFunctions(c *cli.Context) error {
+	return fmt.Errorf("list-functions command requires updated contract with pagination support. This feature will be available after contract upgrade.")
+}
+
+func getFunctionInfo(c *cli.Context) error {
+	if c.NArg() != 1 {
+		return fmt.Errorf("expected exactly one argument: function ID")
+	}
+
+	functionIDHex := c.Args().Get(0)
+	rpcURL := c.String("rpc-url")
+	faasAddress := c.String("faas-address")
+
+	// Connect to Ethereum client
+	client, err := ethclient.Dial(rpcURL)
+	if err != nil {
+		return fmt.Errorf("failed to connect to Ethereum client: %w", err)
+	}
+	defer client.Close()
+
+	// Create FaaS contract instance
+	faas, err := FaaS.NewFaaS(common.HexToAddress(faasAddress), client)
+	if err != nil {
+		return fmt.Errorf("failed to create FaaS contract instance: %w", err)
+	}
+
+	functionID := common.HexToHash(functionIDHex)
+
+	// Get function metadata using existing methods
+	metadata, err := faas.GetFunctionMetadata(nil, functionID)
+	if err != nil {
+		return fmt.Errorf("failed to get function metadata: %w", err)
+	}
+
+	if !metadata.HasContent && !metadata.HasUrl {
+		return fmt.Errorf("function not found")
+	}
+
+	// Display function information (limited by current contract interface)
+	fmt.Printf("Function Information:\n")
+	fmt.Printf("  Function ID: %s\n", functionID.Hex())
+	fmt.Printf("  Name: Not available (requires contract upgrade)\n")
+	fmt.Printf("  Registrar: Not available (requires contract upgrade)\n")
+	fmt.Printf("  Deployed: Not available (requires contract upgrade)\n")
+
+	if metadata.HasContent {
+		fmt.Printf("  Storage: On-chain content\n")
+		fmt.Printf("  Size: %d bytes\n", metadata.ContentLength)
+	}
+
+	if metadata.HasUrl {
+		url, err := faas.GetFunctionUrl(nil, functionID)
+		if err != nil {
+			return fmt.Errorf("failed to get function URL: %w", err)
+		}
+		fmt.Printf("  Storage: Remote URL\n")
+		fmt.Printf("  URL: %s\n", url)
+	}
+
+	return nil
 }
 
 func createTarball(sourceDir string) ([]byte, error) {

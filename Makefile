@@ -25,3 +25,9 @@ build/container:
 
 test:
 	go test ./... -v -p 1
+
+run-dev-vite:
+	cd frontend && npm run dev
+
+run-dev-vite-background:
+	cd frontend && npm run dev > /tmp/vite.log 2>&1 &
