@@ -21,7 +21,7 @@ contract MockTaskMailbox {
         ITaskMailboxTypes.Task memory task
     ) {
         task.payload = tasks[taskHash];
-        task.status = ITaskMailboxTypes.TaskStatus.Created;
+        task.status = ITaskMailboxTypes.TaskStatus.CREATED;
         return task;
     }
     
